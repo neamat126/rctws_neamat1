@@ -1,0 +1,8 @@
+[build]
+buildCommand = "echo 'skip build'"
+
+[deploy]
+startCommand = "node server.js"
+healthcheckPath = "/health"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

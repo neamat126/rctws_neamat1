@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-ssr
+.env
+.env.local
+*.log
+public/trainig_programs.pdf
+src
+public
+index.html
+vite.config.js
+eslint.config.js
+DEPLOY.md
+README.md
+.vscode
