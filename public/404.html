@@ -2,15 +2,16 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>MWRI Promotion System</title>
+  <title>Mwri Promotion System</title>
   <script>
-    // GitHub Pages SPA redirect
+    // GitHub Pages SPA — redirect to index with path encoded in query
+    var segmentCount = 1; // number of path segments in the repo name (rctws_neamat1 = 1)
     var l = window.location;
     l.replace(
       l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-      l.pathname.split('/').slice(0, 1 + 1).join('/') + '/?/' +
-      l.pathname.slice(1).split('/').slice(1).join('/').replace(/&/g, '~and~') +
-      (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+      l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?p=/' +
+      l.pathname.slice(1).split('/').slice(segmentCount).join('/') +
+      (l.search ? '&q=' + l.search.slice(1) : '') +
       l.hash
     );
   </script>
