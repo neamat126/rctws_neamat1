@@ -258,12 +258,6 @@ export default function Profile() {
   };
 
   if (loading) return <div style={s.center}><div style={s.spinner}/><p style={s.loadingText}>جاري التحميل...</p></div>;
-  if (error) return (
-    <div style={s.center}>
-      <p style={{ color: "#E24B4A", fontWeight: 600 }}>{error}</p>
-      <button style={s.btn} onClick={handleLogout}>رجوع</button>
-    </div>
-  );
 
   const sectorCode  = getCodeFromDepartments(data?.concatenated_departments);
   const actualYears = getActualYearsInPhase(data?.Levelname, data?.date_level, sectorCode);
@@ -568,6 +562,11 @@ export default function Profile() {
         <div style={s.warningNote}>
           &#9888; ملاحظة: في حالة وجود خطأ في البيانات يرجى الرجوع إلى الموارد البشرية بجهة عملك الأصلية
         </div>
+        {error && (
+          <div style={{ ...s.warningNote, background: "#FEF2F2", border: "1px solid #FECACA", color: "#c0392b", marginTop: 8 }}>
+            &#9888; {error}
+          </div>
+        )}
       </main>
     </div>
   );

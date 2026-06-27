@@ -36,6 +36,10 @@ app.post('/api/GetDetails', async (req, res) => {
     try {
       const data = JSON.parse(text);
       console.log('Success! Data keys:', Object.keys(data));
+      // لو الـ API رجع error أو مفيش بيانات
+      if (data?.error || data?.message?.toLowerCase().includes('not found') || Object.keys(data).length === 0) {
+        return res.status(404).json({ error: 'not_found' });
+      }
       res.json(data);
     } catch {
       console.log('Response is not JSON, first 500 chars:', text.substring(0, 500));
