@@ -283,7 +283,7 @@ function CourseCard({ name, code, hours, type, courseData, subView }) {
           {/* Row: logo + code + name + request btn */}
           <div style={s.cardTop}>
             <div style={s.cardTopRight}>
-              <img src="/ministy.jpg" alt="ministry" style={s.ministryIcon}/>
+              <img src={`${import.meta.env.BASE_URL}ministy.jpg`} alt="ministry" style={s.ministryIcon}/>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <span style={s.cardCode}>{code}</span>
                 <p style={s.cardName}>{name}</p>

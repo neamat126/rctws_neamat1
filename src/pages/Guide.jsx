@@ -33,7 +33,7 @@ export default function Guide() {
       {/* PDF Viewer */}
       <div style={s.viewerWrap}>
         <iframe
-          src="/trainig_programs.pdf"
+          src={`${import.meta.env.BASE_URL}trainig_programs.pdf`}
           style={s.iframe}
           title="كتيب اللائحة التدريبية"
         />
