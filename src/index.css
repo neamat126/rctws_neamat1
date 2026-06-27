@@ -197,16 +197,20 @@ body { background-color: #f0f2f5; }
   .btn-o, .btn-s { padding: 5px 10px; font-size: 11px; white-space: nowrap; }
 
   /* Steps row */
-  .steps-row { grid-template-columns: 1fr; }
+  .steps-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
   .step {
     border-left: none;
     border-top: 1px solid var(--border);
     padding: 1rem;
     gap: .75rem;
+    align-items: flex-start;
   }
   .step h3 { font-size: 13px; font-weight: 600; line-height: 1.4; }
   .step p  { font-size: 11px; line-height: 1.6; }
-  .step-illus { width: 44px; height: 44px; }
+  .step-illus { width: 44px; height: 44px; flex-shrink: 0; }
 }
 
 @media (max-width: 480px) {
