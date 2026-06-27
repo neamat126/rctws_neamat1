@@ -43,7 +43,7 @@ export default function SignIn() {
       {/* ── Header ── */}
       <header style={s.header}>
         <div style={{ ...s.headerInner, padding: mobile ? ".75rem 1rem" : "1rem 2.5rem" }}>
-          <div style={s.logosRow}>
+          <div style={{ ...s.logosRow, cursor: "pointer" }} onClick={() => navigate("/")}>
             <img src={logo1} alt="logo1" style={{ ...s.logo, height: mobile ? "36px" : "60px" }} />
             <div style={s.vline} />
             <img src={logo2} alt="logo2" style={{ ...s.logo, height: mobile ? "36px" : "60px" }} />

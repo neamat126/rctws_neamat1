@@ -497,7 +497,7 @@ export default function Profile() {
         {/* Footer — logos + logout */}
         <div style={s.sidebarFooter}>
           {!effectiveCollapsed && (
-            <div style={s.sidebarLogos}>
+            <div style={{ ...s.sidebarLogos, cursor: "pointer" }} onClick={() => navigate("/")}>
               <img src={logo2} alt="logo2" style={s.sidebarLogo}/>
               <img src={logo1} alt="logo1" style={s.sidebarLogo}/>
               <img src={logo3} alt="logo3" style={s.sidebarLogo}/>
