@@ -288,8 +288,8 @@ export default function Profile() {
     { path: "/settings", label: "الإعدادات",              icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>, section: "other" },
   ];
 
-  const sidebarW = mobile ? (sidebarOpen ? "240px" : "0px") : (collapsed ? "64px" : "240px");
-  const effectiveCollapsed = mobile ? true : collapsed;
+  const sidebarW = mobile ? (sidebarOpen ? "100%" : "0px") : (collapsed ? "64px" : "240px");
+  const effectiveCollapsed = mobile ? false : collapsed;
 
   const canAccessRequired = () => {
     const spec  = (localStorage.getItem("SpecializationName") || "").trim();
@@ -471,15 +471,15 @@ export default function Profile() {
       </aside>
 
       {/* Main */}
-      <main style={{ ...s.main, marginRight: mobile ? "0" : sidebarW, paddingTop: mobile ? "56px" : "24px" }}>
+      <main style={{ ...s.main, marginRight: mobile ? "0" : sidebarW, paddingTop: mobile ? "56px" : "24px", padding: mobile ? "56px 12px 24px" : "24px 28px 40px" }}>
         {/* Row 1 — 3 cards */}
-        <div style={{ ...s.statsGrid3, gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)" }}>
+        <div style={{ ...s.statsGrid3, gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(3,1fr)" }}>
           <StatCard icon="degree" label="الدرجة الوظيفية"  value={data?.Levelname || "—"}       color="#7C3AED" />
           <StatCard icon="date"   label="تاريخ التعيين"    value={data?.ActualHiringDate || "—"} color="#0891B2" />
           <StatCard icon="clock"  label="تاريخ آخر ترقية" value={data?.date_level || "—"}       color="#059669" />
         </div>
         {/* Row 2 — 2 cards */}
-        <div style={{ ...s.statsGrid2, gridTemplateColumns: mobile ? "1fr" : "1fr 1fr" }}>
+        <div style={{ ...s.statsGrid2, gridTemplateColumns: "1fr 1fr" }}>
           <StatCard icon="years" label="السنوات الفعلية للائحة" value={actualYears} color="#D97706" />
           <StatCard icon="org"   label="الجهة المستوى الاول"    value={parentOrg}   color="#2563EB" small />
         </div>
