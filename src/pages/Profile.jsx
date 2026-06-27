@@ -10,6 +10,7 @@ import logo1 from "../assets/logo1.png";
 import logo2 from "../assets/logo2.png";
 import logo3 from "../assets/logo3.png";
 import API_BASE from "../api";
+import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 
 const COURSE_IMAGES = { t: imgT, c: imgC, f: imgF, m: imgM, w: imgW };
 const getCourseImage = (code) => {
@@ -157,7 +158,10 @@ export default function Profile() {
   const [hoveredNav, setHoveredNav] = useState(null);
   const [hiddenExpanded, setHiddenExpanded] = useState(false);
   const [manager, setManager] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const nationalId = localStorage.getItem("nationalId");
+  const w = useWindowWidth();
+  const mobile = isSmall(w);
 
   useEffect(() => {
     if (!nationalId) { navigate("/"); return; }
@@ -284,7 +288,8 @@ export default function Profile() {
     { path: "/settings", label: "الإعدادات",              icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>, section: "other" },
   ];
 
-  const sidebarW = collapsed ? "64px" : "240px";
+  const sidebarW = mobile ? (sidebarOpen ? "240px" : "0px") : (collapsed ? "64px" : "240px");
+  const effectiveCollapsed = mobile ? true : collapsed;
 
   const canAccessRequired = () => {
     const spec  = (localStorage.getItem("SpecializationName") || "").trim();
@@ -312,10 +317,30 @@ export default function Profile() {
 
   return (
     <div style={s.container}>
+      {/* Mobile hamburger button */}
+      {mobile && (
+        <button
+          style={s.hamburger}
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round">
+            {sidebarOpen
+              ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
+              : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>
+            }
+          </svg>
+        </button>
+      )}
+
+      {/* Mobile overlay */}
+      {mobile && sidebarOpen && (
+        <div style={s.overlay} onClick={() => setSidebarOpen(false)} />
+      )}
       {/* Sidebar */}
-      <aside style={{ ...s.sidebar, width: sidebarW }}>
+      <aside style={{ ...s.sidebar, width: sidebarW, display: mobile && !sidebarOpen ? "none" : "flex", position: mobile ? "fixed" : "fixed" }}>
 
         {/* Collapse toggle */}
+        {!mobile && (
         <button
           style={s.collapseBtn}
           onClick={() => setCollapsed(!collapsed)}
@@ -326,9 +351,10 @@ export default function Profile() {
             <polyline points="15 18 9 12 15 6"/>
           </svg>
         </button>
+        )}
 
         {/* Avatar — top */}
-        {!collapsed && (
+        {!effectiveCollapsed && (
           <div style={s.avatarSection}>
             <div style={s.avatarWrap}>
               <div style={s.avatar}>{initials}</div>
@@ -345,7 +371,7 @@ export default function Profile() {
 
         {/* Nav — top */}
         <nav style={{ ...s.nav, padding: "12px 8px", flex: 1 }}>
-          {!collapsed && <p style={s.navSectionLabel}>القائمة</p>}
+          {!effectiveCollapsed && <p style={s.navSectionLabel}>القائمة</p>}
           {NAV_ITEMS.filter(i => i.section === "main").map(({ path, label, icon, badge }) => {
             const active = location.pathname === path;
             const hovered = hoveredNav === path;
@@ -355,33 +381,28 @@ export default function Profile() {
                   href="#"
                   style={{
                     ...s.navLink,
-                    justifyContent: collapsed ? "center" : "flex-start",
+                    justifyContent: effectiveCollapsed ? "center" : "flex-start",
                     ...(active ? s.navLinkActive : {}),
                     ...(hovered && !active ? s.navLinkHover : {}),
                   }}
                   onClick={e => {
                     e.preventDefault();
+                    if (mobile) setSidebarOpen(false);
                     if (path === "/required") {
-                      if (canAccessRequired()) {
-                        navigate(path);
-                      } else {
-                        alert("جاري استكمال باقي البرامج");
-                      }
-                    } else {
-                      navigate(path);
-                    }
+                      if (canAccessRequired()) { navigate(path); }
+                      else { alert("جاري استكمال باقي البرامج"); }
+                    } else { navigate(path); }
                   }}
                   onMouseEnter={() => setHoveredNav(path)}
                   onMouseLeave={() => setHoveredNav(null)}
                 >
                   <span style={{ ...s.navIcon, ...(active ? s.navIconActive : {}) }}>{icon}</span>
-                  {!collapsed && <span style={{ flex: 1 }}>{label}</span>}
-                  {!collapsed && badge !== undefined && (
+                  {!effectiveCollapsed && <span style={{ flex: 1 }}>{label}</span>}
+                  {!effectiveCollapsed && badge !== undefined && (
                     <span style={{ ...s.badge, ...(active ? s.badgeActive : {}) }}>{badge}</span>
                   )}
                 </a>
-                {/* Tooltip when collapsed */}
-                {collapsed && hovered && (
+                {effectiveCollapsed && hovered && !mobile && (
                   <div style={s.tooltip}>{label}{badge !== undefined ? ` (${badge})` : ""}</div>
                 )}
               </div>
@@ -390,7 +411,7 @@ export default function Profile() {
 
           {/* Divider */}
           <div style={s.navDivider}>
-            {!collapsed && <span style={s.navDividerLabel}>أخرى</span>}
+            {!effectiveCollapsed && <span style={s.navDividerLabel}>أخرى</span>}
           </div>
 
           {NAV_ITEMS.filter(i => i.section === "other").map(({ path, label, icon }) => {
@@ -402,25 +423,23 @@ export default function Profile() {
                   href="#"
                   style={{
                     ...s.navLink,
-                    justifyContent: collapsed ? "center" : "flex-start",
+                    justifyContent: effectiveCollapsed ? "center" : "flex-start",
                     ...(active ? s.navLinkActive : {}),
                     ...(hovered && !active ? s.navLinkHover : {}),
                   }}
                   onClick={e => {
                     e.preventDefault();
-                    if (path === "/schedule") {
-                      navigate("/guide");
-                    } else {
-                      navigate(path);
-                    }
+                    if (mobile) setSidebarOpen(false);
+                    if (path === "/schedule") { navigate("/guide"); }
+                    else { navigate(path); }
                   }}
                   onMouseEnter={() => setHoveredNav(path)}
                   onMouseLeave={() => setHoveredNav(null)}
                 >
                   <span style={{ ...s.navIcon, ...(active ? s.navIconActive : {}) }}>{icon}</span>
-                  {!collapsed && <span style={{ flex: 1 }}>{label}</span>}
+                  {!effectiveCollapsed && <span style={{ flex: 1 }}>{label}</span>}
                 </a>
-                {collapsed && hovered && (
+                {effectiveCollapsed && hovered && !mobile && (
                   <div style={s.tooltip}>{label}</div>
                 )}
               </div>
@@ -430,7 +449,7 @@ export default function Profile() {
 
         {/* Footer — logos + logout */}
         <div style={s.sidebarFooter}>
-          {!collapsed && (
+          {!effectiveCollapsed && (
             <div style={s.sidebarLogos}>
               <img src={logo2} alt="logo2" style={s.sidebarLogo}/>
               <img src={logo1} alt="logo1" style={s.sidebarLogo}/>
@@ -439,7 +458,7 @@ export default function Profile() {
           )}
           <div style={s.footerDivider}/>
           <button
-            style={{ ...s.logoutBtn, justifyContent: collapsed ? "center" : "flex-start" }}
+            style={{ ...s.logoutBtn, justifyContent: effectiveCollapsed ? "center" : "flex-start" }}
             onClick={handleLogout}
             title="تسجيل خروج"
           >
@@ -452,21 +471,21 @@ export default function Profile() {
       </aside>
 
       {/* Main */}
-      <main style={{ ...s.main, marginRight: sidebarW }}>
+      <main style={{ ...s.main, marginRight: mobile ? "0" : sidebarW, paddingTop: mobile ? "56px" : "24px" }}>
         {/* Row 1 — 3 cards */}
-        <div style={s.statsGrid3}>
+        <div style={{ ...s.statsGrid3, gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)" }}>
           <StatCard icon="degree" label="الدرجة الوظيفية"  value={data?.Levelname || "—"}       color="#7C3AED" />
           <StatCard icon="date"   label="تاريخ التعيين"    value={data?.ActualHiringDate || "—"} color="#0891B2" />
           <StatCard icon="clock"  label="تاريخ آخر ترقية" value={data?.date_level || "—"}       color="#059669" />
         </div>
         {/* Row 2 — 2 cards */}
-        <div style={s.statsGrid2}>
+        <div style={{ ...s.statsGrid2, gridTemplateColumns: mobile ? "1fr" : "1fr 1fr" }}>
           <StatCard icon="years" label="السنوات الفعلية للائحة" value={actualYears} color="#D97706" />
-          <StatCard icon="org"   label="الجهة المستوى الاول"              value={parentOrg}   color="#2563EB" small />
+          <StatCard icon="org"   label="الجهة المستوى الاول"    value={parentOrg}   color="#2563EB" small />
         </div>
 
         {/* Two columns */}
-        <div style={s.twoColumn}>
+        <div style={{ ...s.twoColumn, gridTemplateColumns: mobile ? "1fr" : "1fr 1fr" }}>
           {/* Left */}
           <div style={s.column}>
             <div style={s.card}>
@@ -822,4 +841,17 @@ const s = {
 
   // Warning
   warningNote: { display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#FAEEDA", border: "1px solid #EF9F27", color: "#854F0B", padding: "10px 14px", borderRadius: "8px", fontSize: "12px", lineHeight: "1.6" },
+
+  // Mobile
+  hamburger: {
+    position: "fixed", top: "12px", right: "12px", zIndex: 200,
+    width: "40px", height: "40px", borderRadius: "10px",
+    backgroundColor: "#041d52", border: "none", cursor: "pointer",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+  },
+  overlay: {
+    position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 99,
+  },
 };

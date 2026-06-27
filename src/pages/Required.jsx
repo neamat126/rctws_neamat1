@@ -18,6 +18,8 @@ import a8 from "../assets/a8.png";
 import a9 from "../assets/a9.png";
 import API_BASE from "../api";
 
+import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
+
 const NUM_ICONS = { 1: a1, 2: a2, 3: a3, 4: a4, 5: a5, 6: null, 7: a7, 8: a8, 9: a9 };
 
 const COURSE_IMAGES = { t: imgT, c: imgC, f: imgF, m: imgM, w: imgW };
@@ -37,6 +39,8 @@ export default function Required() {
   const Degree       = localStorage.getItem("levelCode");
   const Years_Remain = localStorage.getItem("actualYearsInPhase");
   const empname      = localStorage.getItem("empname");
+  const w = useWindowWidth();
+  const mobile = isSmall(w);
 
   useEffect(() => {
     if (!org_code || !Degree) {
@@ -93,7 +97,7 @@ export default function Required() {
   const getName = (c) => c.fundamental_course_name || c.optional_course_name || "—";
 
   return (
-    <div style={s.page}>
+    <div style={{ ...s.page, padding: mobile ? "16px 12px 32px" : "24px 28px 40px" }}>
       {/* Header */}
       <div style={s.header}>
         <button style={s.backBtn} onClick={() => navigate("/profile")}>
@@ -175,7 +179,7 @@ export default function Required() {
           {displayList.length === 0 ? (
             <div style={s.center}><p style={{ color: "#9AA3AF", fontSize: 13 }}>لا توجد برامج في هذا القسم</p></div>
           ) : (
-            <div style={s.grid}>
+            <div style={{ ...s.grid, gridTemplateColumns: mobile ? "repeat(2,1fr)" : "repeat(auto-fill, minmax(220px, 1fr))" }}>
               {displayList.map((c, i) => (
                 <CourseCard
                   key={`${activeTab}-${subView}-${getCode(c)}-${i}`}

@@ -8,6 +8,7 @@ import logo3 from "../assets/logo3.png";
 import avatar  from "../assets/avatar.png";
 import avatar2 from "../assets/avatar2.png";
 import avatar3 from "../assets/avatar3.jpg";
+import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ export default function SignUp() {
   const [password, setPassword]     = useState("");
   const [error, setError]           = useState("");
   const [loading, setLoading]       = useState(false);
+  const w = useWindowWidth();
+  const mobile = isSmall(w);
 
   const handleSignUp = async () => {
     if (!nationalId || !password) { setError("من فضلك ادخل الرقم القومي وكلمة السر"); return; }
@@ -34,24 +37,24 @@ export default function SignUp() {
     <div style={s.page}>
 
       <header style={s.header}>
-        <div style={s.headerInner}>
+        <div style={{ ...s.headerInner, padding: mobile ? ".75rem 1rem" : "1rem 2.5rem" }}>
           <div style={s.logosRow}>
-            <img src={logo1} alt="logo1" style={s.logo} />
+            <img src={logo1} alt="logo1" style={{ ...s.logo, height: mobile ? "36px" : "60px" }} />
             <div style={s.vline} />
-            <img src={logo2} alt="logo2" style={s.logo} />
-            <div style={s.vline} />
-            <img src={logo3} alt="logo3" style={s.logo} />
+            <img src={logo2} alt="logo2" style={{ ...s.logo, height: mobile ? "36px" : "60px" }} />
+            {!mobile && <><div style={s.vline} /><img src={logo3} alt="logo3" style={s.logo} /></>}
           </div>
           <div style={s.titleBlock}>
-            <span style={s.titleAr}>وزارة الموارد المائية والري</span>
-            <span style={s.titleEn}>Ministry of Water Resources & Irrigation</span>
+            <span style={{ ...s.titleAr, fontSize: mobile ? 13 : 17 }}>وزارة الموارد المائية والري</span>
+            {!mobile && <span style={s.titleEn}>Ministry of Water Resources & Irrigation</span>}
           </div>
         </div>
         <div style={s.headerBar} />
       </header>
 
-      <main style={s.main}>
+      <main style={{ ...s.main, flexDirection: mobile ? "column" : "row" }}>
 
+        {!mobile && (
         <div style={s.leftPanel}>
           <div style={s.leftContent}>
 
@@ -84,8 +87,9 @@ export default function SignUp() {
             </div>
           </div>
         </div>
+        )}
 
-        <div style={s.rightPanel}>
+        <div style={{ ...s.rightPanel, padding: mobile ? "1.5rem 1rem" : "2.5rem" }}>
           <div style={s.card}>
             <div style={s.cardHeader}>
               <div style={s.cardIcon}>

@@ -7,6 +7,7 @@ import imgM from "../assets/m.png";
 import imgW from "../assets/w.png";
 import imgDefault from "../assets/bg1.png";
 import API_BASE from "../api";
+import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 
 const COURSE_IMAGES = { t: imgT, c: imgC, f: imgF, m: imgM, w: imgW };
 const getCourseImage = (code) => {
@@ -19,6 +20,8 @@ export default function Programs() {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const nationalId = localStorage.getItem("nationalId");
+  const w = useWindowWidth();
+  const mobile = isSmall(w);
 
   useEffect(() => {
     if (!nationalId) { navigate("/"); return; }
@@ -39,7 +42,7 @@ export default function Programs() {
   }, [nationalId, navigate]);
 
   return (
-    <div style={s.container}>
+    <div style={{ ...s.container, padding: mobile ? "16px" : "28px 32px" }}>
       {/* Header */}
       <div style={s.header}>
         <button style={s.backBtn} onClick={() => navigate("/profile")}>
@@ -59,7 +62,7 @@ export default function Programs() {
       ) : programs.length === 0 ? (
         <div style={s.center}><p style={{ color: "#9AA3AF", fontSize: 14 }}>لا توجد برامج مسجلة</p></div>
       ) : (
-        <div style={s.grid}>
+        <div style={{ ...s.grid, gridTemplateColumns: mobile ? "repeat(2,1fr)" : "repeat(auto-fill, minmax(200px, 1fr))" }}>
           {programs.map((prog, i) => {
             const name = prog.course_Name || prog.course_name || "—";
             const code = prog.course_ID   || prog.course_id   || "—";

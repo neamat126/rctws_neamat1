@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API_BASE from "../api";
+import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 
 export default function ManagerRequests() {
   const navigate   = useNavigate();
@@ -10,8 +11,9 @@ export default function ManagerRequests() {
 
   const managerId   = localStorage.getItem("nationalId");
   const managerName = localStorage.getItem("empname");
-  // الـ API بيحتاج Manager_ID = رقم قومي المدير المباشر
   const apiManagerId = localStorage.getItem("Manager_Nid") || managerId;
+  const w = useWindowWidth();
+  const mobile = isSmall(w);
 
   useEffect(() => {
     if (!managerId) { navigate("/"); return; }
@@ -41,7 +43,7 @@ export default function ManagerRequests() {
   const totalCourses = trainees.reduce((s, t) => s + (t.courses?.length || 0), 0);
 
   return (
-    <div style={s.page}>
+    <div style={{ ...s.page, padding: mobile ? "16px 12px 32px" : "24px 28px 40px" }}>
       {/* Header */}
       <div style={s.header}>
         <button style={s.backBtn} onClick={() => navigate("/profile")}>
@@ -182,7 +184,7 @@ function CourseRow({ course, trainee, managerId, managerName }) {
     "Accept";
 
   return (
-    <div style={s.courseRow}>
+    <div style={{ ...s.courseRow, flexWrap: "wrap", gap: "8px" }}>
       <div style={s.courseInfo}>
         <span style={s.courseCode}>{course.course_code}</span>
         <span style={s.courseName}>{course.Program_title || "—"}</span>

@@ -6,6 +6,7 @@ import logo1 from "../assets/logo1.png";
 import logo2 from "../assets/logo2.png";
 import logo3 from "../assets/logo3.png";
 import avatar2 from "../assets/avatar2.png";
+import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -14,6 +15,8 @@ export default function SignIn() {
   const [showPass, setShowPass]     = useState(false);
   const [error, setError]           = useState("");
   const [loading, setLoading]       = useState(false);
+  const w = useWindowWidth();
+  const mobile = isSmall(w);
 
   const handleLogin = async () => {
     if (!nationalId || !password) { setError("من فضلك ادخل الرقم القومي وكلمة السر"); return; }
@@ -39,27 +42,27 @@ export default function SignIn() {
 
       {/* ── Header ── */}
       <header style={s.header}>
-        <div style={s.headerInner}>
+        <div style={{ ...s.headerInner, padding: mobile ? ".75rem 1rem" : "1rem 2.5rem" }}>
           <div style={s.logosRow}>
-            <img src={logo1} alt="logo1" style={s.logo} />
+            <img src={logo1} alt="logo1" style={{ ...s.logo, height: mobile ? "36px" : "60px" }} />
             <div style={s.vline} />
-            <img src={logo2} alt="logo2" style={s.logo} />
-            <div style={s.vline} />
-            <img src={logo3} alt="logo3" style={s.logo} />
+            <img src={logo2} alt="logo2" style={{ ...s.logo, height: mobile ? "36px" : "60px" }} />
+            {!mobile && <><div style={s.vline} /><img src={logo3} alt="logo3" style={s.logo} /></>}
           </div>
           <div style={s.titleBlock}>
-            <span style={s.titleAr}>وزارة الموارد المائية والري</span>
-            <span style={s.titleEn}>Ministry of Water Resources & Irrigation</span>
-            <span style={s.titleEn}>Promotion system</span>
+            <span style={{ ...s.titleAr, fontSize: mobile ? 13 : 17 }}>وزارة الموارد المائية والري</span>
+            {!mobile && <span style={s.titleEn}>Ministry of Water Resources & Irrigation</span>}
+            {!mobile && <span style={s.titleEn}>Promotion system</span>}
           </div>
         </div>
         <div style={s.headerBar} />
       </header>
 
       {/* ── Page body ── */}
-      <main style={s.main}>
+      <main style={{ ...s.main, flexDirection: mobile ? "column" : "row" }}>
 
         {/* Left decorative panel */}
+        {!mobile && (
         <div style={s.leftPanel}>
           <div style={s.leftContent}>
             {/* Illustration with rings + glow */}
@@ -92,9 +95,10 @@ export default function SignIn() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Right form card */}
-        <div style={s.rightPanel}>
+        <div style={{ ...s.rightPanel, padding: mobile ? "1.5rem 1rem" : "2.5rem" }}>
           <div style={s.card}>
             <div style={s.cardHeader}>
               <div style={s.cardIcon}>
