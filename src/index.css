@@ -176,22 +176,25 @@ body { background-color: #f0f2f5; }
   .hero-av-border { width: 90px; height: 90px; }
 
   /* Nav */
-  nav {
-    padding: .6rem 1rem;
-    flex-wrap: wrap;
-    gap: .5rem;
+  .page nav {
+    padding: .6rem .75rem;
+    flex-wrap: nowrap;
+    gap: .4rem;
+    overflow: hidden;
   }
   .logos-zone {
-    gap: .5rem;
+    gap: .4rem;
     flex: 1;
     min-width: 0;
+    overflow: hidden;
   }
-  .logo-img { width: 36px; height: 36px; }
-  .sep { height: 32px; }
-  .sys-name-ar { font-size: 11px; }
+  .logo-img { width: 32px; height: 32px; flex-shrink: 0; }
+  .sep { height: 28px; flex-shrink: 0; }
+  .sys-name-block { min-width: 0; overflow: hidden; }
+  .sys-name-ar { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sys-name-en { display: none; }
-  .nav-btns { gap: 5px; }
-  .btn-o, .btn-s { padding: 6px 12px; font-size: 11px; white-space: nowrap; }
+  .nav-btns { display: flex; gap: 4px; flex-shrink: 0; }
+  .btn-o, .btn-s { padding: 5px 10px; font-size: 11px; white-space: nowrap; }
 
   /* Steps row */
   .steps-row { grid-template-columns: 1fr; }
@@ -209,9 +212,9 @@ body { background-color: #f0f2f5; }
 @media (max-width: 480px) {
   .h1 { font-size: 1.5rem; }
   .sub { font-size: 12px; }
-  .logo-img { width: 30px; height: 30px; }
-  .sys-name-ar { font-size: 10px; }
-  .btn-o, .btn-s { padding: 5px 10px; font-size: 11px; }
+  .logo-img { width: 28px; height: 28px; }
+  .sys-name-ar { font-size: 9px; }
+  .btn-o, .btn-s { padding: 5px 8px; font-size: 10px; }
   .step h3 { font-size: 12px; }
   .step p  { font-size: 11px; }
 }
