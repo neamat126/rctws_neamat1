@@ -50,7 +50,7 @@ export default function SignIn() {
             {!mobile && <><div style={s.vline} /><img src={logo3} alt="logo3" style={s.logo} /></>}
           </div>
           <div style={s.titleBlock}>
-            <span style={{ ...s.titleAr, fontSize: mobile ? 13 : 17 }}>وزارة الموارد المائية والري</span>
+            <span style={{ ...s.titleAr, fontSize: mobile ? 12 : 17 }}>وزارة الموارد المائية والري</span>
             {!mobile && <span style={s.titleEn}>Ministry of Water Resources & Irrigation</span>}
             {!mobile && <span style={s.titleEn}>Promotion system</span>}
           </div>
@@ -59,47 +59,60 @@ export default function SignIn() {
       </header>
 
       {/* ── Page body ── */}
-      <main style={{ ...s.main, flexDirection: mobile ? "column" : "row" }}>
+      <main style={{ ...s.main, flexDirection: mobile ? "column" : "row", alignItems: mobile ? "center" : "stretch" }}>
 
-        {/* Left decorative panel */}
-        {!mobile && (
-        <div style={s.leftPanel}>
-          <div style={s.leftContent}>
-            {/* Illustration with rings + glow */}
-            <div style={s.illustWrap}>
-              <div style={s.illustRing1} />
-              <div style={s.illustRing2} />
-              <div style={s.illustBorder}>
-                <img src={avatar2} alt="illustration" style={s.illustImg} />
-              </div>
-              <div style={s.illustBadge}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                  <path d="M20 6L9 17l-5-5" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+        {/* الـ illustration — على الموبايل تظهر فوق الكارد، على الديسكتوب في اللفت بانيل */}
+        {mobile ? (
+          /* Mobile: صورة صغيرة فوق الكارد مع خلفية زرقاء */
+          <div style={s.mobileHero}>
+            <div style={s.mobileHeroInner}>
+              <div style={s.mobileRing1} />
+              <div style={s.mobileRing2} />
+              <div style={s.mobileBorder}>
+                <img src={avatar2} alt="illustration" style={s.mobileImg} />
               </div>
             </div>
-            <h2 style={s.panelTitle}>اللائحة التدريبية للعاملين <br/>بوزارة الموارد المائية و الري </h2>
-            <p style={s.panelSub}>MWRI Promotion System</p>
-            <div style={s.dividerLine} />
-            <p style={s.panelDesc}>
-              منصة رقمية متكاملة لمتابعة مسار البرامج اللائحة التدريبية<br/>
-              وإدارة البرامج التدريبية الإلزامية
-            </p>
-            <div style={s.featureList}>
-              {["متابعة طلبات البرامج اللائحة التدريبية", "البرامج التدريبية الإلزامية", "الملف الوظيفي الرقمي"].map((f, i) => (
-                <div key={i} style={s.featureItem}>
-                  <span style={s.featureDot} />
-                  <span>{f}</span>
+            <h2 style={s.mobilePanelTitle}>اللائحة التدريبية للعاملين</h2>
+            <p style={s.mobilePanelSub}>MWRI Promotion System</p>
+          </div>
+        ) : (
+          /* Desktop: اللفت بانيل الكامل */
+          <div style={s.leftPanel}>
+            <div style={s.leftContent}>
+              <div style={s.illustWrap}>
+                <div style={s.illustRing1} />
+                <div style={s.illustRing2} />
+                <div style={s.illustBorder}>
+                  <img src={avatar2} alt="illustration" style={s.illustImg} />
                 </div>
-              ))}
+                <div style={s.illustBadge}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 6L9 17l-5-5" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <h2 style={s.panelTitle}>اللائحة التدريبية للعاملين <br/>بوزارة الموارد المائية و الري</h2>
+              <p style={s.panelSub}>MWRI Promotion System</p>
+              <div style={s.dividerLine} />
+              <p style={s.panelDesc}>
+                منصة رقمية متكاملة لمتابعة مسار البرامج اللائحة التدريبية<br/>
+                وإدارة البرامج التدريبية الإلزامية
+              </p>
+              <div style={s.featureList}>
+                {["متابعة طلبات البرامج اللائحة التدريبية", "البرامج التدريبية الإلزامية", "الملف الوظيفي الرقمي"].map((f, i) => (
+                  <div key={i} style={s.featureItem}>
+                    <span style={s.featureDot} />
+                    <span>{f}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
         )}
 
-        {/* Right form card */}
-        <div style={{ ...s.rightPanel, padding: mobile ? "1.5rem 1rem" : "2.5rem" }}>
-          <div style={s.card}>
+        {/* ── الكارد — نفس التصميم على الموبايل والديسكتوب ── */}
+        <div style={{ ...s.rightPanel, padding: mobile ? "1rem" : "2.5rem", width: mobile ? "100%" : "auto" }}>
+          <div style={{ ...s.card, maxWidth: mobile ? "100%" : 420, boxShadow: mobile ? "0 2px 16px rgba(27,79,122,.1)" : "0 4px 24px rgba(27,79,122,.08)" }}>
             <div style={s.cardHeader}>
               <div style={s.cardIcon}>
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
@@ -127,6 +140,7 @@ export default function SignIn() {
                     onChange={e => setNationalId(e.target.value)}
                     dir="rtl"
                     maxLength={14}
+                    inputMode="numeric"
                   />
                 </div>
               </div>
@@ -163,9 +177,7 @@ export default function SignIn() {
               )}
 
               <button style={{ ...s.submitBtn, opacity: loading ? .7 : 1 }} onClick={handleLogin} disabled={loading}>
-                {loading
-                  ? <><span style={s.spinner} /> جارٍ التحقق...</>
-                  : "دخول"}
+                {loading ? <><span style={s.spinner} /> جارٍ التحقق...</> : "دخول"}
               </button>
 
               <div style={s.switchRow}>
@@ -199,64 +211,50 @@ const s = {
   titleEn: { fontSize: 12, color: "#9AA0A8", letterSpacing: ".3px" },
   headerBar: { height: 4, background: "linear-gradient(90deg, #1B4F7A 0%, #2468A0 60%, #D9632A 100%)" },
 
-  /* Main layout */
-  main: { flex: 1, display: "flex", alignItems: "stretch" },
+  /* Main */
+  main: { flex: 1, display: "flex" },
 
-  leftPanel: { width: "42%", background: "linear-gradient(160deg, #1B4F7A 0%, #1a3f6a 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "3rem 2.5rem", position: "relative", overflow: "hidden" },
-  leftContent: { position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "1rem" },
-  avatarWrap: { position: "relative", marginBottom: ".5rem", animation: "fadeUp .6s .3s both" },
-  avatarImg: { width: 150, height: 150, borderRadius: "50%", objectFit: "cover", border: "4px solid rgba(255,255,255,.3)", display: "block", boxShadow: "0 8px 32px rgba(0,0,0,.25)" },
-  avatarBadge: { position: "absolute", bottom: 6, left: 6, width: 28, height: 28, borderRadius: "50%", background: "#27ae60", border: "2.5px solid #1a3f6a", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(39,174,96,.4)" },
-  illustWrap: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: ".5rem",
-    animation: "fadeUp .6s .3s both",
+  /* Mobile hero strip */
+  mobileHero: {
+    width: "100%",
+    background: "linear-gradient(160deg, #1B4F7A 0%, #1a3f6a 100%)",
+    display: "flex", flexDirection: "column", alignItems: "center",
+    padding: "1.5rem 1rem 1rem",
+    gap: "0.5rem",
   },
-  illustRing1: {
-    position: "absolute",
-    width: 170, height: 170,
-    borderRadius: "50%",
+  mobileHeroInner: {
+    position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
+    width: 110, height: 110, marginBottom: "0.5rem",
+  },
+  mobileRing1: {
+    position: "absolute", width: 100, height: 100, borderRadius: "50%",
     border: "1.5px dashed rgba(255,255,255,.45)",
     animation: "spinRingS 20s linear infinite",
   },
-  illustRing2: {
-    position: "absolute",
-    width: 200, height: 200,
-    borderRadius: "50%",
+  mobileRing2: {
+    position: "absolute", width: 118, height: 118, borderRadius: "50%",
     border: "1.5px solid rgba(255,176,116,.5)",
     animation: "spinRingRS 28s linear infinite",
   },
-  illustBorder: {
-    width: 130, height: 130,
-    borderRadius: "50%",
-    padding: 3,
+  mobileBorder: {
+    width: 80, height: 80, borderRadius: "50%", padding: 3,
     background: "linear-gradient(135deg, #FFB074 0%, #fff 50%, #D9632A 100%)",
-    animation: "glowPulseS 3s ease-in-out infinite",
-    position: "relative", zIndex: 1,
-    flexShrink: 0,
+    position: "relative", zIndex: 1, flexShrink: 0,
   },
-  illustImg: {
-    width: "100%", height: "100%",
-    borderRadius: "50%",
-    objectFit: "cover",
-    display: "block",
-  },
-  illustBadge: {
-    position: "absolute",
-    bottom: 6, left: "calc(50% + 38px)",
-    width: 24, height: 24,
-    borderRadius: "50%",
-    background: "#27ae60",
-    border: "2px solid #1a3f6a",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    zIndex: 2,
-    boxShadow: "0 2px 6px rgba(39,174,96,.5)",
-  },
+  mobileImg: { width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", display: "block" },
+  mobilePanelTitle: { fontSize: 15, fontWeight: 600, color: "#fff", textAlign: "center", margin: 0 },
+  mobilePanelSub: { fontSize: 11, color: "rgba(255,255,255,.5)", margin: 0 },
+
+  /* Desktop left panel */
+  leftPanel: { width: "42%", background: "linear-gradient(160deg, #1B4F7A 0%, #1a3f6a 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "3rem 2.5rem", position: "relative", overflow: "hidden" },
+  leftContent: { position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "1rem" },
+  illustWrap: { position: "relative", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: ".5rem", animation: "fadeUp .6s .3s both" },
+  illustRing1: { position: "absolute", width: 170, height: 170, borderRadius: "50%", border: "1.5px dashed rgba(255,255,255,.45)", animation: "spinRingS 20s linear infinite" },
+  illustRing2: { position: "absolute", width: 200, height: 200, borderRadius: "50%", border: "1.5px solid rgba(255,176,116,.5)", animation: "spinRingRS 28s linear infinite" },
+  illustBorder: { width: 130, height: 130, borderRadius: "50%", padding: 3, background: "linear-gradient(135deg, #FFB074 0%, #fff 50%, #D9632A 100%)", animation: "glowPulseS 3s ease-in-out infinite", position: "relative", zIndex: 1, flexShrink: 0 },
+  illustImg: { width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", display: "block" },
+  illustBadge: { position: "absolute", bottom: 6, left: "calc(50% + 38px)", width: 24, height: 24, borderRadius: "50%", background: "#27ae60", border: "2px solid #1a3f6a", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2, boxShadow: "0 2px 6px rgba(39,174,96,.5)" },
   panelTitle: { fontSize: 22, fontWeight: 600, color: "#fff", textAlign: "right", margin: 0 },
-  iconCircle: { width: 80, height: 80, borderRadius: "50%", background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.15)", display: "flex", alignItems: "center", justifyContent: "center" },
   panelSub: { fontSize: 13, color: "rgba(255,255,255,.5)", letterSpacing: ".5px", margin: 0 },
   dividerLine: { width: "100%", height: 1, background: "rgba(255,255,255,.15)" },
   panelDesc: { fontSize: 13, color: "rgba(255,255,255,.6)", lineHeight: 2, textAlign: "right", margin: 0 },
@@ -264,14 +262,13 @@ const s = {
   featureItem: { display: "flex", alignItems: "center", gap: 10, justifyContent: "flex-end", fontSize: 13, color: "rgba(255,255,255,.75)" },
   featureDot: { width: 6, height: 6, borderRadius: "50%", background: "#FFB074", flexShrink: 0 },
 
-  /* Right form */
+  /* Card */
   rightPanel: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "2.5rem" },
   card: { width: "100%", maxWidth: 420, background: "#fff", borderRadius: 16, border: "1px solid #DDE1E7", boxShadow: "0 4px 24px rgba(27,79,122,.08)", overflow: "hidden" },
   cardHeader: { background: "#EBF3FA", padding: "1.75rem 2rem 1.5rem", textAlign: "center", borderBottom: "1px solid #DDE1E7" },
   cardIcon: { width: 52, height: 52, borderRadius: 13, background: "#fff", border: "1px solid #DDE1E7", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto .75rem" },
   cardTitle: { fontSize: 18, fontWeight: 600, color: "#1A2332", margin: "0 0 4px" },
   cardSub: { fontSize: 12, color: "#9AA0A8", margin: 0 },
-
   formBody: { padding: "1.75rem 2rem" },
   fieldGroup: { marginBottom: "1.1rem" },
   fieldLabel: { display: "block", fontSize: 12, color: "#9AA0A8", marginBottom: 6, fontWeight: 500 },
@@ -279,15 +276,11 @@ const s = {
   inputIcon: { flexShrink: 0 },
   input: { flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 13, color: "#1A2332", fontFamily: "inherit", direction: "rtl" },
   eyeBtn: { background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center" },
-
   errorBox: { display: "flex", alignItems: "center", gap: 6, background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "9px 12px", marginBottom: "1rem", fontSize: 12, color: "#c0392b", direction: "rtl" },
-
   submitBtn: { width: "100%", padding: "12px", background: "#1B4F7A", color: "#fff", border: "none", borderRadius: 9, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: ".2s", marginBottom: "1rem" },
   spinner: { width: 14, height: 14, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .7s linear infinite", display: "inline-block" },
-
   switchRow: { display: "flex", alignItems: "center", justifyContent: "center", gap: 6 },
   switchText: { fontSize: 12, color: "#9AA0A8" },
   switchLink: { fontSize: 12, color: "#2468A0", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, padding: 0 },
-
   footer: { background: "#fff", borderTop: "1px solid #DDE1E7", padding: ".75rem 2rem", textAlign: "center", fontSize: 11, color: "#9AA0A8" },
 };

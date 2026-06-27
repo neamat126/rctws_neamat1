@@ -7,6 +7,7 @@ import icon1 from "../assets/avatar4.jpg";
 import icon2 from "../assets/avatar2.png";
 import icon3 from "../assets/avatar3.jpg";
 import heroAvatar from "../assets/avatar.png";
+import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 
 export default function Home() {
   const navigate = useNavigate();
