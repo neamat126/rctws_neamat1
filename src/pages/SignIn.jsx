@@ -31,8 +31,8 @@ export default function SignIn() {
         if (stored === password || part === password) {
           localStorage.setItem("nationalId", nationalId);
           navigate("/profile");
-        } else { setError("كلمة السر غلط"); }
-      } else { setError("الرقم القومي مش موجود، سجل أولاً"); }
+        } else { setError("كلمة السر خطأ"); }
+      } else { setError("الرقم القومي غير موجود، سجل أولاً"); }
     } catch (e) { setError("حصل خطأ: " + e.message); }
     setLoading(false);
   };
