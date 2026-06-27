@@ -159,6 +159,8 @@ export default function Profile() {
   const [hiddenExpanded, setHiddenExpanded] = useState(false);
   const [manager, setManager] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [apiFailCount, setApiFailCount] = useState(0);
+  const [apiDoneCount, setApiDoneCount] = useState(0);
   const nationalId = localStorage.getItem("nationalId");
   const w = useWindowWidth();
   const mobile = isSmall(w);
@@ -172,9 +174,21 @@ export default function Profile() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ nationalId }),
         });
+        // 404 = الـ backend مش شغال → امنع دخول البروفايل
+        if (res.status === 404) {
+          setError("الخادم غير متاح حالياً، يرجى المحاولة لاحقاً");
+          setLoading(false);
+          return;
+        }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         setData(await res.json());
-      } catch { setError("تعذر تحميل البيانات"); }
+      } catch {
+        // 500 أو network error → افتح الصفحة ببيانات فاضية
+        setData({});
+        setApiFailCount(c => c + 1);
+        setError("تعذر تحميل بعض البيانات — تأكد من اتصالك بالإنترنت");
+      }
+      setApiDoneCount(c => c + 1);
       setLoading(false);
     };
     fetchData();
@@ -218,7 +232,8 @@ export default function Profile() {
         // خزن أكواد البرامج المكتملة
         const codes = arr.map(p => (p.course_ID || p.course_id || "").trim().toLowerCase()).filter(Boolean);
         localStorage.setItem("completedCourseCodes", JSON.stringify(codes));
-      } catch (e) { console.error("Programs fetch error:", e); }
+      } catch (e) { console.error("Programs fetch error:", e); setApiFailCount(c => c + 1); }
+      setApiDoneCount(c => c + 1);
     };
     fetchPrograms();
   }, [nationalId]);
@@ -242,7 +257,8 @@ export default function Profile() {
         // هل الموظف الحالي مدير؟ لو nationalId موجود كـ Manger_Nid بـ LevelID=2
         const isManager = arr.some(r => r.LevelID === 2 && r.Manger_Nid?.trim() === nationalId.trim());
         localStorage.setItem("isManager", isManager ? "1" : "0");
-      } catch (e) { console.error("Manager fetch error:", e); }
+      } catch (e) { console.error("Manager fetch error:", e); setApiFailCount(c => c + 1); }
+      setApiDoneCount(c => c + 1);
     };
     fetchManager();
   }, [nationalId]);
@@ -258,6 +274,19 @@ export default function Profile() {
   };
 
   if (loading) return <div style={s.center}><div style={s.spinner}/><p style={s.loadingText}>جاري التحميل...</p></div>;
+
+  // لو الـ backend مش شغال (404) أو كل الـ 3 APIs فشلت — overlay أسود مع popup
+  const allApisFailed = apiDoneCount >= 3 && apiFailCount >= 3;
+  if (!data || allApisFailed) return (
+    <div style={s.blockOverlay}>
+      <div style={s.blockPopup}>
+        <div style={s.blockIcon}>⚠️</div>
+        <h3 style={s.blockTitle}>الخادم غير متاح</h3>
+        <p style={s.blockMsg}>{error || "تعذر الاتصال بالخادم، يرجى المحاولة لاحقاً"}</p>
+        <button style={s.blockBtn} onClick={handleLogout}>العودة لتسجيل الدخول</button>
+      </div>
+    </div>
+  );
 
   const sectorCode  = getCodeFromDepartments(data?.concatenated_departments);
   const actualYears = getActualYearsInPhase(data?.Levelname, data?.date_level, sectorCode);
