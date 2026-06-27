@@ -473,7 +473,7 @@ export default function Profile() {
       {/* Main */}
       <main style={{ ...s.main, marginRight: mobile ? "0" : sidebarW, paddingTop: mobile ? "56px" : "24px", padding: mobile ? "56px 12px 24px" : "24px 28px 40px" }}>
         {/* Row 1 — 3 cards */}
-        <div style={{ ...s.statsGrid3, gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(3,1fr)" }}>
+        <div style={{ ...s.statsGrid3, gridTemplateColumns: "repeat(3,1fr)" }}>
           <StatCard icon="degree" label="الدرجة الوظيفية"  value={data?.Levelname || "—"}       color="#7C3AED" />
           <StatCard icon="date"   label="تاريخ التعيين"    value={data?.ActualHiringDate || "—"} color="#0891B2" />
           <StatCard icon="clock"  label="تاريخ آخر ترقية" value={data?.date_level || "—"}       color="#059669" />
@@ -785,8 +785,8 @@ const s = {
   statsGrid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "18px" },
   statCard: {
     backgroundColor: "#fff", border: "1px solid #E8ECF2", borderRadius: "12px",
-    padding: "14px 16px", display: "flex", flexDirection: "column",
-    alignItems: "center", textAlign: "center", gap: "6px",
+    padding: "10px 8px", display: "flex", flexDirection: "column",
+    alignItems: "center", textAlign: "center", gap: "4px",
     boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
   },
   statIconBox: {
