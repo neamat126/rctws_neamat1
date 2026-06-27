@@ -72,7 +72,7 @@ export default function SignIn() {
                 <img src={avatar2} alt="illustration" style={s.mobileImg} />
               </div>
             </div>
-            <h2 style={s.mobilePanelTitle}>اللائحة التدريبية للعاملين</h2>
+            <h2 style={s.mobilePanelTitle}> اللائحة التدريبية للعاملين بوزارة الموارد المائية و الري</h2>
             <p style={s.mobilePanelSub}>MWRI Promotion System</p>
           </div>
         ) : (
