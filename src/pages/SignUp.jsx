@@ -52,9 +52,29 @@ export default function SignUp() {
         <div style={s.headerBar} />
       </header>
 
-      <main style={{ ...s.main, flexDirection: mobile ? "column" : "row" }}>
+      <main style={{ ...s.main, flexDirection: mobile ? "column" : "row", alignItems: mobile ? "center" : "stretch" }}>
 
-        {!mobile && (
+        {mobile ? (
+          /* Mobile hero — الصور الثلاث مع خلفية زرقاء */
+          <div style={s.mobileHero}>
+            <div style={s.mobileAvatarsRow}>
+              <img src={avatar3} alt="u" style={{...s.mobileAv, zIndex:1, animation:"floatAvatar 4s .6s ease-in-out infinite"}} />
+              <img src={avatar2} alt="u" style={{...s.mobileAv, zIndex:2, marginRight:-20, animation:"floatAvatar 4s .3s ease-in-out infinite"}} />
+              <img src={avatar}  alt="u" style={{...s.mobileAv, zIndex:3, marginRight:-20, animation:"floatAvatar 4s 0s ease-in-out infinite"}} />
+              <div style={s.mobileAvCount}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" stroke="rgba(255,255,255,.7)" strokeWidth="1.5"/>
+                  <path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="rgba(255,255,255,.7)" strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M19 4v6M16 7h6" stroke="#FFB074" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <p style={s.mobileAvCaption}>موظف مسجّل في المنصة</p>
+            <h2 style={s.mobilePanelTitle}>انضم إلى منصة اللائحة التدريبية</h2>
+            <p style={s.mobilePanelSub}>MWRI Promotion System</p>
+          </div>
+        ) : (
+          /* Desktop left panel */
         <div style={s.leftPanel}>
           <div style={s.leftContent}>
 
@@ -89,7 +109,7 @@ export default function SignUp() {
         </div>
         )}
 
-        <div style={{ ...s.rightPanel, padding: mobile ? "1.5rem 1rem" : "2.5rem" }}>
+        <div style={{ ...s.rightPanel, padding: mobile ? "1rem" : "2.5rem", width: mobile ? "100%" : "auto" }}>
           <div style={s.card}>
             <div style={s.cardHeader}>
               <div style={s.cardIcon}>
@@ -205,4 +225,32 @@ const s = {
   switchText:  { fontSize:12, color:"#9AA0A8" },
   switchLink:  { fontSize:12, color:"#2468A0", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", fontWeight:600, padding:0 },
   footer:      { background:"#fff", borderTop:"1px solid #DDE1E7", padding:".75rem 2rem", textAlign:"center", fontSize:11, color:"#9AA0A8" },
+
+  // Mobile hero
+  mobileHero: {
+    width: "100%",
+    background: "linear-gradient(160deg, #1B4F7A 0%, #1a3f6a 100%)",
+    display: "flex", flexDirection: "column", alignItems: "center",
+    padding: "1.5rem 1rem 1rem",
+    gap: "0.4rem",
+  },
+  mobileAvatarsRow: {
+    display: "flex", alignItems: "center", flexDirection: "row-reverse",
+    marginBottom: "0.3rem",
+  },
+  mobileAv: {
+    width: 60, height: 60, borderRadius: "50%", objectFit: "cover",
+    border: "3px solid rgba(255,255,255,.3)",
+    boxShadow: "0 4px 16px rgba(0,0,0,.3)",
+  },
+  mobileAvCount: {
+    width: 60, height: 60, borderRadius: "50%",
+    background: "rgba(255,255,255,.12)",
+    border: "3px solid rgba(255,255,255,.2)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    marginRight: -20, zIndex: 0,
+  },
+  mobileAvCaption: { fontSize: 11, color: "rgba(255,255,255,.5)", margin: 0 },
+  mobilePanelTitle: { fontSize: 13, fontWeight: 600, color: "#fff", textAlign: "center", margin: 0, lineHeight: 1.5, padding: "0 0.5rem" },
+  mobilePanelSub: { fontSize: 11, color: "rgba(255,255,255,.5)", margin: 0 },
 };
