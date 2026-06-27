@@ -176,7 +176,7 @@ export default function Profile() {
         });
         // 404 = الـ backend مش شغال → امنع دخول البروفايل
         if (res.status === 404) {
-          setError("الخادم غير متاح حالياً، يرجى المحاولة لاحقاً");
+          setError("هذا المستخدم غير مسجل لدى وزارة الموارد المائية و الري ... يرجي التأكد  من اضاة بياناتك لدى قاعدة بيانات الموارد البشريه و المحاولة");
           setLoading(false);
           return;
         }
@@ -280,10 +280,34 @@ export default function Profile() {
   if (!data || allApisFailed) return (
     <div style={s.blockOverlay}>
       <div style={s.blockPopup}>
-        <div style={s.blockIcon}>⚠️</div>
-        <h3 style={s.blockTitle}>الخادم غير متاح</h3>
-        <p style={s.blockMsg}>{error || "تعذر الاتصال بالخادم، يرجى المحاولة لاحقاً"}</p>
-        <button style={s.blockBtn} onClick={handleLogout}>العودة لتسجيل الدخول</button>
+        {/* أيقونة متحركة */}
+        <div style={s.blockIconWrap}>
+          <div style={s.blockIconRing} />
+          <span style={s.blockIconEmoji}>🔌</span>
+        </div>
+
+        {/* النص */}
+        <h3 style={s.blockTitle}>" هذا المستخدم غير مسجل لدى وزارة الموارد المائية و الري ... يرجي التأكد  من اضافة بياناتك لدى قاعدة بيانات الموارد البشريه و المحاولة مره اخرى</h3>
+        <p style={s.blockMsg}>
+          تعذّر الاتصال بالخادم<br/>
+          يرجى التحقق من اتصالك بالإنترنت<br/>
+          والمحاولة مرة أخرى
+        </p>
+
+        {/* Divider */}
+        <div style={s.blockDivider} />
+
+        {/* زرار */}
+        <button style={s.blockBtn} onClick={handleLogout}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 8 }}>
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          العودة لتسجيل الدخول
+        </button>
+
+        <p style={s.blockHint}>إذا استمرت المشكلة، تواصل مع الدعم الفني</p>
       </div>
     </div>
   );
@@ -882,4 +906,51 @@ const s = {
     position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 99,
   },
+
+  // Block overlay (404 / all APIs failed)
+  blockOverlay: {
+    position: "fixed", inset: 0,
+    background: "rgba(4,10,25,0.92)",
+    backdropFilter: "blur(6px)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    zIndex: 9999, direction: "rtl",
+  },
+  blockPopup: {
+    background: "linear-gradient(145deg, #ffffff 0%, #f0f4ff 100%)",
+    borderRadius: 24,
+    padding: "2.5rem 2rem 2rem",
+    maxWidth: 380, width: "90%",
+    textAlign: "center",
+    boxShadow: "0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1)",
+    animation: "fadeUp .4s cubic-bezier(.16,1,.3,1) both",
+  },
+  blockIconWrap: {
+    position: "relative", width: 80, height: 80,
+    margin: "0 auto 1.25rem",
+    display: "flex", alignItems: "center", justifyContent: "center",
+  },
+  blockIconRing: {
+    position: "absolute", inset: 0, borderRadius: "50%",
+    background: "linear-gradient(135deg, #fee2e2, #fecaca)",
+    animation: "pulse 2s ease-in-out infinite",
+  },
+  blockIconEmoji: { fontSize: 36, position: "relative", zIndex: 1 },
+  blockTitle: { fontSize: 20, fontWeight: 700, color: "#1A2332", margin: "0 0 12px" },
+  blockMsg: { fontSize: 14, color: "#6B7280", lineHeight: 1.9, margin: "0 0 20px" },
+  blockDivider: {
+    height: 1,
+    background: "linear-gradient(90deg, transparent, #e5e7eb, transparent)",
+    margin: "0 0 20px",
+  },
+  blockBtn: {
+    display: "flex", alignItems: "center", justifyContent: "center",
+    padding: "12px 28px",
+    background: "linear-gradient(135deg, #1B4F7A, #2468A0)",
+    color: "#fff", border: "none", borderRadius: 12,
+    fontSize: 14, fontWeight: 600, cursor: "pointer",
+    fontFamily: "inherit", width: "100%",
+    boxShadow: "0 4px 15px rgba(27,79,122,0.4)",
+    marginBottom: 14,
+  },
+  blockHint: { fontSize: 11, color: "#9CA3AF", margin: 0 },
 };
