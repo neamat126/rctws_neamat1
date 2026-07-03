@@ -7,6 +7,7 @@ import Programs from "./pages/Programs";
 import Required from "./pages/Required";
 import Guide from "./pages/Guide";
 import ManagerRequests from "./pages/ManagerRequests";
+import Messages from "./pages/Messages";
 
 export default function App() {
   return (
@@ -20,10 +21,8 @@ export default function App() {
         <Route path="/required" element={<Required />} />
         <Route path="/guide" element={<Guide />} />
         <Route path="/manager-requests" element={<ManagerRequests />} />
-        {/* Redirect placeholder routes to guide/profile until pages are built */}
+        <Route path="/settings" element={<Messages />} />
         <Route path="/schedule" element={<Navigate to="/guide" replace />} />
-        <Route path="/settings" element={<Navigate to="/profile" replace />} />
-        {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
