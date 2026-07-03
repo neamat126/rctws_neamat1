@@ -293,10 +293,17 @@ export default function Profile() {
     if (!org_code || !Degree || !nationalId) return;
 
     // الـ key مربوط بالـ nationalId عشان مفيش تداخل بين users
-    const reqKey = `requiredCourseCodes_${nationalId}`;
+    const reqKey      = `requiredCourseCodes_${nationalId}`;
+    const hoursKey    = `requiredHoursMap_${nationalId}`;
+    const totalHoursKey = `requiredTotalHours_${nationalId}`;
+
     if (localStorage.getItem(reqKey)) {
-      // موجود بالفعل — حط في الـ key العام عشان progress bar يقرأه
+      // موجود بالفعل — حط في الـ keys العامة عشان progress bar يقرأها
       localStorage.setItem("requiredCourseCodes", localStorage.getItem(reqKey));
+      if (localStorage.getItem(hoursKey)) {
+        localStorage.setItem("requiredHoursMap",   localStorage.getItem(hoursKey));
+        localStorage.setItem("requiredTotalHours", localStorage.getItem(totalHoursKey) || "0");
+      }
       return;
     }
 
@@ -321,7 +328,8 @@ export default function Profile() {
         ).filter(Boolean);
 
         const allCodes = [...fundamentalCodes, ...optionalCodes];
-        // خزّن مربوط بالـ nationalId + الـ key العام
+
+        // خزّن الـ codes
         localStorage.setItem(reqKey, JSON.stringify(allCodes));
         localStorage.setItem("requiredCourseCodes", JSON.stringify(allCodes));
 
@@ -331,8 +339,12 @@ export default function Profile() {
           const code = (c.fundamental_course_code || c.optional_course_code || "").trim().toLowerCase();
           if (code) hoursMap[code] = parseInt(c.Hours) || 0;
         });
-        localStorage.setItem("requiredHoursMap", JSON.stringify(hoursMap));
         const totalHours = Object.values(hoursMap).reduce((s, h) => s + h, 0);
+
+        // خزّن مربوط بالـ nationalId + العامة
+        localStorage.setItem(hoursKey,    JSON.stringify(hoursMap));
+        localStorage.setItem(totalHoursKey, totalHours.toString());
+        localStorage.setItem("requiredHoursMap",   JSON.stringify(hoursMap));
         localStorage.setItem("requiredTotalHours", totalHours.toString());
       } catch { /* silent */ }
     };
