@@ -844,6 +844,7 @@ const s = {
   navLink: {
     color: "rgba(255,255,255,0.55)", textDecoration: "none",
     padding: "9px 12px", borderRadius: "8px", fontSize: "12px",
+    fontWeight: "600",
     display: "flex", alignItems: "center", gap: "10px", cursor: "pointer",
     whiteSpace: "nowrap", overflow: "hidden",
     transition: "background 0.12s, color 0.12s",
