@@ -1,7 +1,19 @@
 import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 
 export default function Notifications() {
   const navigate = useNavigate();
+  const w = useWindowWidth();
+  const mobile = isSmall(w);
+
+  const empname  = localStorage.getItem("empname") || "";
+  const levelname = localStorage.getItem("Levelname") || "";
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
 
   // اقرأ كل الإشعارات المخزنة
   const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
@@ -13,17 +25,15 @@ export default function Notifications() {
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
+  const sidebarW = mobile ? "0px" : "240px";
 
   return (
-    <div style={s.page}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f4f6fa", direction: "rtl" }}>
+      <Sidebar empname={empname} levelname={levelname} onLogout={handleLogout} />
+
+      <div style={{ flex: 1, marginRight: sidebarW, padding: mobile ? "56px 16px 32px" : "24px 28px 40px", fontFamily: "'IBM Plex Sans Arabic', 'Segoe UI', sans-serif" }}>
       {/* Header */}
       <div style={s.header}>
-        <button style={s.backBtn} onClick={() => navigate("/profile")}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-          رجوع
-        </button>
         <div style={{ flex: 1 }}>
           <h2 style={s.title}>الإشعارات</h2>
           {unreadCount > 0 && <p style={s.sub}>{unreadCount} إشعار غير مقروء</p>}
@@ -56,6 +66,7 @@ export default function Notifications() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

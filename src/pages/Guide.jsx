@@ -2,20 +2,26 @@ import { useNavigate } from "react-router-dom";
 import logo1 from "../assets/logo1.png";
 import logo2 from "../assets/logo2.png";
 import logo3 from "../assets/logo3.png";
+import Sidebar from "../components/Sidebar";
+import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 
 export default function Guide() {
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const w         = useWindowWidth();
+  const mobile    = isSmall(w);
+  const empname   = localStorage.getItem("empname") || "";
+  const levelname = localStorage.getItem("Levelname") || "";
+  const sidebarW  = mobile ? "0px" : "240px";
+
+  const handleLogout = () => { localStorage.clear(); navigate("/"); };
 
   return (
-    <div style={s.page}>
+    <div style={{ display: "flex", minHeight: "100vh", direction: "rtl" }}>
+      <Sidebar empname={empname} levelname={levelname} onLogout={handleLogout} />
+
+      <div style={{ flex: 1, marginRight: sidebarW, display: "flex", flexDirection: "column", paddingTop: mobile ? "56px" : "0" }}>
       {/* Header */}
       <div style={s.header}>
-        <button style={s.backBtn} onClick={() => navigate("/profile")}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-          رجوع
-        </button>
 
         <div style={s.headerCenter}>
           <div style={s.logos}>
@@ -37,6 +43,7 @@ export default function Guide() {
           style={s.iframe}
           title="كتيب اللائحة التدريبية"
         />
+      </div>
       </div>
     </div>
   );
