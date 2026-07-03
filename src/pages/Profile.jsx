@@ -158,7 +158,7 @@ export default function Profile() {
   const [hoveredNav, setHoveredNav] = useState(null);
   const [hiddenExpanded, setHiddenExpanded] = useState(false);
   const [manager, setManager] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showTrainingDialog, setShowTrainingDialog] = useState(false);
   const [apiFailCount, setApiFailCount] = useState(0);
   const [apiDoneCount, setApiDoneCount] = useState(0);
   const nationalId = localStorage.getItem("nationalId");
@@ -364,6 +364,38 @@ export default function Profile() {
 
   return (
     <div style={s.container}>
+
+      {/* Training dialog */}
+      {showTrainingDialog && (
+        <div style={s.blockOverlay}>
+          <div style={s.blockPopup}>
+            <div style={s.blockIconWrap}>
+              <div style={{ ...s.blockIconRing, background: "linear-gradient(135deg, #dbeafe, #bfdbfe)" }} />
+              <span style={s.blockIconEmoji}>📋</span>
+            </div>
+            <h3 style={s.blockTitle}>جاري استكمال باقي البرامج</h3>
+            <p style={s.blockMsg}>
+              شكراً لكم، ويمكنكم التقديم في البرامج<br/>
+              التدريبية الخاصة بالمركز
+            </p>
+            <div style={s.blockDivider} />
+            <div style={{ display: "flex", gap: 10, marginBottom: 0 }}>
+              <button
+                style={{ ...s.blockBtn, background: "linear-gradient(135deg, #1B4F7A, #2468A0)", flex: 1, marginBottom: 0 }}
+                onClick={() => {
+                  setShowTrainingDialog(false);
+                  window.open("https://docs.google.com/forms/d/e/1FAIpQLSfv9ieB4_g3nBds3STEZS34MrYbG-q20iLeUyRwqzoFcGNgbA/formResponse", "_blank");
+                }}
+              >OK</button>
+              <button
+                style={{ ...s.blockBtn, background: "#6B7280", flex: 1, marginBottom: 0 }}
+                onClick={() => setShowTrainingDialog(false)}
+              >Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile hamburger button */}
       {mobile && (
         <button
@@ -437,7 +469,7 @@ export default function Profile() {
                     if (mobile) setSidebarOpen(false);
                     if (path === "/required") {
                       if (canAccessRequired()) { navigate(path); }
-                      else { alert("جاري استكمال باقي البرامج"); }
+                      else { setShowTrainingDialog(true); }
                     } else { navigate(path); }
                   }}
                   onMouseEnter={() => setHoveredNav(path)}
