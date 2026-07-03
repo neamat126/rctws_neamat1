@@ -40,6 +40,11 @@ export default function Sidebar({ empname, levelname, programs = [], onRequiredC
       icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> },
   ];
 
+  const getActivePath = (path) => {
+    if (path === "/schedule") return location.pathname === "/guide";
+    return location.pathname === path;
+  };
+
   const handleNavClick = (path) => {
     if (mobile) setSidebarOpen(false);
     if (path === "/required") {
@@ -102,7 +107,7 @@ export default function Sidebar({ empname, levelname, programs = [], onRequiredC
           {!effectiveCollapsed && <p style={s.navSectionLabel}>القائمة</p>}
 
           {NAV_ITEMS.filter(i => i.section === "main").map(({ path, label, icon, badge }) => {
-            const active  = location.pathname === path;
+            const active  = getActivePath(path);
             const hovered = hoveredNav === path;
             return (
               <div key={path} style={{ position: "relative" }}>
@@ -127,7 +132,7 @@ export default function Sidebar({ empname, levelname, programs = [], onRequiredC
           </div>
 
           {NAV_ITEMS.filter(i => i.section === "other").map(({ path, label, icon }) => {
-            const active  = location.pathname === path;
+            const active  = getActivePath(path);
             const hovered = hoveredNav === path;
             return (
               <div key={path} style={{ position: "relative" }}>
