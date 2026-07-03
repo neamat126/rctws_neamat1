@@ -270,14 +270,21 @@ export default function Profile() {
   useEffect(() => {
     const month = new Date().getMonth() + 1;
     if (month === 7 || month === 10) {
-      const key = `reminder_dismissed_${new Date().getFullYear()}_${month}`;
-      if (!localStorage.getItem(key)) {
-        // خزّن الإشعار في صفحة الإشعارات
+      const popupKey = `reminder_dismissed_${new Date().getFullYear()}_${month}`;
+      const notifKey = `reminder_notif_added_${new Date().getFullYear()}_${month}`;
+
+      // خزّن الإشعار مرة واحدة بس في كل شهر — بغض النظر عن الـ popup
+      if (!localStorage.getItem(notifKey)) {
         addNotification({
           title: "تذكير: تقديم طلبات البرامج التدريبية",
           message: `تذكير بضرورة تقديم طلبات البرامج التدريبية قبل نهاية شهر ${month === 7 ? "يوليو" : "أكتوبر"}. يرجى المبادرة بتقديم طلباتك في أقرب وقت.`,
           icon: "🔔",
         });
+        localStorage.setItem(notifKey, "1");
+      }
+
+      // اعرض الـ popup مرة واحدة بس
+      if (!localStorage.getItem(popupKey)) {
         setShowReminderBanner(true);
       }
     }
