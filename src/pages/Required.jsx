@@ -86,6 +86,18 @@ export default function Required() {
 
     const allCodes = [...fundamentalCodes, ...optionalCodes];
     localStorage.setItem("requiredCourseCodes", JSON.stringify(allCodes));
+
+    // خزّن map من كود → ساعات عشان نحسب ساعات المكتملة
+    const hoursMap = {};
+    [...fundamental, ...optional.slice(0, optRequired)].forEach(c => {
+      const code = (c.fundamental_course_code || c.optional_course_code || "").trim().toLowerCase();
+      if (code) hoursMap[code] = parseInt(c.Hours) || 0;
+    });
+    localStorage.setItem("requiredHoursMap", JSON.stringify(hoursMap));
+
+    // الساعات الإجمالية المطلوبة
+    const totalHours = Object.values(hoursMap).reduce((s, h) => s + h, 0);
+    localStorage.setItem("requiredTotalHours", totalHours.toString());
   }
 
   // actual years remaining — لو 0 أو مش موجود نحط 1 عشان منقسمش على صفر

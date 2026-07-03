@@ -158,6 +158,9 @@ export default function Profile() {
   const [collapsed, setCollapsed] = useState(false);
   const [hoveredNav, setHoveredNav] = useState(null);
   const [hiddenExpanded, setHiddenExpanded] = useState(false);
+  const [hiddenPassword, setHiddenPassword] = useState("");
+  const [hiddenUnlocked, setHiddenUnlocked] = useState(false);
+  const [hiddenPasswordError, setHiddenPasswordError] = useState(false);
   const [manager, setManager] = useState(null);
   const [showTrainingDialog, setShowTrainingDialog] = useState(false);
   const [showReminderBanner, setShowReminderBanner] = useState(false);
@@ -321,6 +324,16 @@ export default function Profile() {
         // خزّن مربوط بالـ nationalId + الـ key العام
         localStorage.setItem(reqKey, JSON.stringify(allCodes));
         localStorage.setItem("requiredCourseCodes", JSON.stringify(allCodes));
+
+        // خزّن map من كود → ساعات
+        const hoursMap = {};
+        [...fundamental, ...optional.slice(0, optRequired)].forEach(c => {
+          const code = (c.fundamental_course_code || c.optional_course_code || "").trim().toLowerCase();
+          if (code) hoursMap[code] = parseInt(c.Hours) || 0;
+        });
+        localStorage.setItem("requiredHoursMap", JSON.stringify(hoursMap));
+        const totalHours = Object.values(hoursMap).reduce((s, h) => s + h, 0);
+        localStorage.setItem("requiredTotalHours", totalHours.toString());
       } catch { /* silent */ }
     };
     fetchRequired();
@@ -717,81 +730,105 @@ export default function Profile() {
           <StatCard icon="org"   label="الجهة المستوى الاول"    value={parentOrg}   color="#2563EB" small />
         </div>
 
-        {/* Progress Bar — نسبة إنجاز اللائحة */}
+        {/* Progress Bars — كارد واحد فيه نسبة البرامج والساعات جمب بعض */}
         {(() => {
           const requiredCodes  = JSON.parse(localStorage.getItem("requiredCourseCodes") || "[]");
           const completedCodes = JSON.parse(localStorage.getItem("completedCourseCodes") || "[]");
+          const hoursMap       = JSON.parse(localStorage.getItem("requiredHoursMap") || "{}");
+          const totalHours     = parseInt(localStorage.getItem("requiredTotalHours") || "0");
           const total     = requiredCodes.length;
-          const completed = total > 0
-            ? requiredCodes.filter(c => completedCodes.includes(c)).length
-            : 0;
-
           if (total === 0) return null;
 
-          const pct = Math.min(100, Math.round((completed / total) * 100));
-          const color  = pct >= 80 ? "#059669" : pct >= 50 ? "#D97706" : "#1B4F7A";
-          const color2 = pct >= 80 ? "#34D399" : pct >= 50 ? "#FCD34D" : "#60A5FA";
-          const emoji  = pct === 100 ? "🏆" : pct >= 80 ? "🌟" : pct >= 50 ? "📈" : "🎯";
-          const msg    = pct === 100 ? " أكملت جميع البرامج المطلوبة"
-                       : pct >= 80  ? " أوشكت على إتمام اللائحة"
-                       : pct >= 50  ? "استمر! أنجزت أكثر من النصف"
-                       : "ابدأ بتقديم طلبات البرامج المطلوبة";
+          const completed      = requiredCodes.filter(c => completedCodes.includes(c)).length;
+          const completedHours = completedCodes.reduce((sum, code) => sum + (hoursMap[code] || 0), 0);
+
+          const pct  = Math.min(100, Math.round((completed / total) * 100));
+          const pctH = totalHours > 0 ? Math.min(100, Math.round((completedHours / totalHours) * 100)) : 0;
+
+          const c1 = pct  >= 80 ? "#059669" : pct  >= 50 ? "#D97706" : "#1B4F7A";
+          const c2 = pct  >= 80 ? "#34D399" : pct  >= 50 ? "#FCD34D" : "#60A5FA";
+          const c3 = pctH >= 80 ? "#059669" : pctH >= 50 ? "#D97706" : "#0891B2";
+          const c4 = pctH >= 80 ? "#34D399" : pctH >= 50 ? "#FCD34D" : "#38BDF8";
+
+          const msg = pct === 100 ? "أكملت جميع البرامج 🏆"
+                    : pct >= 80   ? "أوشكت على الإتمام 🌟"
+                    : pct >= 50   ? "أكثر من النصف 📈"
+                    : "ابدأ بتقديم طلباتك 🎯";
+
           return (
-            <div style={s.progressCard}>
-              {/* Top row */}
-              <div style={s.progressHeader}>
-                <div style={s.progressLabelGroup}>
-                  <div style={s.progressIconWrap}>
-                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* قاعدة */}
-                      <line x1="4" y1="32" x2="32" y2="32" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
-                      {/* عمود 1 — قصير */}
-                      <rect x="6" y="24" width="6" height="8" rx="1.5" fill={color} opacity="0.4"
-                        style={{ animation: "barGrow1 1.4s ease-in-out infinite alternate", transformOrigin: "9px 32px" }}/>
-                      {/* عمود 2 — متوسط */}
-                      <rect x="15" y="18" width="6" height="14" rx="1.5" fill={color} opacity="0.7"
-                        style={{ animation: "barGrow2 1.4s ease-in-out infinite alternate", transformOrigin: "18px 32px" }}/>
-                      {/* عمود 3 — طويل */}
-                      <rect x="24" y="10" width="6" height="22" rx="1.5" fill={color}
-                        style={{ animation: "barGrow3 1.4s ease-in-out infinite alternate", transformOrigin: "27px 32px" }}/>
-                      {/* نجمة فوق العمود الأطول */}
-                      <g style={{ animation: "starBounce 1.4s ease-in-out infinite alternate", transformOrigin: "27px 7px" }}>
-                        <path d="M27 4l.8 2.4 2.5.2-1.9 1.7.6 2.4L27 9.4l-2 1.3.6-2.4-1.9-1.7 2.5-.2z" fill={color2}/>
-                      </g>
-                    </svg>
-                    <style>{`
-                      @keyframes barGrow1 { 0% { transform: scaleY(0.7); } 100% { transform: scaleY(1.15); } }
-                      @keyframes barGrow2 { 0% { transform: scaleY(0.8); } 100% { transform: scaleY(1.1); } animation-delay: 0.15s; }
-                      @keyframes barGrow3 { 0% { transform: scaleY(0.85); } 100% { transform: scaleY(1.08); } animation-delay: 0.3s; }
-                      @keyframes starBounce { 0% { transform: translateY(2px) scale(0.9); } 100% { transform: translateY(-3px) scale(1.2); } }
-                    `}</style>
-                  </div>
-                  <div>
-                    <p style={s.progressTitle}>نسبة إنجاز اللائحة التدريبية</p>
-                    <p style={s.progressMsg}>{msg}</p>
-                  </div>
-                </div>
-                <div style={{ ...s.progressCircle, borderColor: color }}>
-                  <span style={{ ...s.progressPct, color }}>{pct}%</span>
-                </div>
+            <div style={s.dualProgressCard}>
+              {/* عنوان الكارد */}
+              <div style={s.dualProgressHeader}>
+                <span style={s.dualProgressTitle}>📊 إنجاز اللائحة التدريبية</span>
+                <span style={s.dualProgressMsg}>{msg}</span>
               </div>
 
-              {/* Bar */}
-              <div style={s.progressTrack}>
-                <div style={{
-                  ...s.progressFill,
-                  width: `${pct}%`,
-                  background: `linear-gradient(90deg, ${color} 0%, ${color2} 100%)`,
-                }}>
-                  {pct > 10 && <div style={s.progressShine} />}
+              <div style={{ display: "flex", gap: "16px", flexDirection: mobile ? "column" : "row" }}>
+
+                {/* Bar 1 — البرامج */}
+                <div style={s.singleBar}>
+                  <div style={s.singleBarTop}>
+                    <div style={{ ...s.progressIconWrap, width: 40, height: 40, background: "linear-gradient(135deg, #EFF6FF, #DBEAFE)" }}>
+                      <svg width="22" height="22" viewBox="0 0 36 36" fill="none">
+                        <line x1="4" y1="32" x2="32" y2="32" stroke={c1} strokeWidth="1.5" strokeLinecap="round"/>
+                        <rect x="6" y="24" width="6" height="8" rx="1.5" fill={c1} opacity="0.4" style={{ animation: "barGrow1 1.4s ease-in-out infinite alternate", transformOrigin: "9px 32px" }}/>
+                        <rect x="15" y="18" width="6" height="14" rx="1.5" fill={c1} opacity="0.7" style={{ animation: "barGrow2 1.4s ease-in-out infinite alternate", transformOrigin: "18px 32px" }}/>
+                        <rect x="24" y="10" width="6" height="22" rx="1.5" fill={c1} style={{ animation: "barGrow3 1.4s ease-in-out infinite alternate", transformOrigin: "27px 32px" }}/>
+                        <g style={{ animation: "starBounce 1.4s ease-in-out infinite alternate", transformOrigin: "27px 7px" }}>
+                          <path d="M27 4l.8 2.4 2.5.2-1.9 1.7.6 2.4L27 9.4l-2 1.3.6-2.4-1.9-1.7 2.5-.2z" fill={c2}/>
+                        </g>
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={s.singleBarLabel}>البرامج المكتملة</p>
+                      <p style={{ ...s.singleBarValue, color: c1 }}>{completed} / {total} برنامج</p>
+                    </div>
+                    <div style={{ ...s.progressCircle, borderColor: c1, width: 44, height: 44 }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: c1 }}>{pct}%</span>
+                    </div>
+                  </div>
+                  <div style={s.progressTrack}>
+                    <div style={{ ...s.progressFill, width: `${pct}%`, background: `linear-gradient(90deg, ${c1}, ${c2})` }}>
+                      {pct > 10 && <div style={s.progressShine}/>}
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 11, color: "#9AA3AF", margin: 0 }}>{total - completed} برنامج متبقي</p>
+                </div>
+
+                {/* فاصل عمودي */}
+                {!mobile && <div style={s.dualDivider}/>}
+
+                {/* Bar 2 — الساعات */}
+                <div style={s.singleBar}>
+                  <div style={s.singleBarTop}>
+                    <div style={{ ...s.progressIconWrap, width: 40, height: 40, background: "linear-gradient(135deg, #E0F2FE, #BAE6FD)" }}>
+                      <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                        <circle cx="14" cy="14" r="11" stroke={c3} strokeWidth="2"/>
+                        <path d="M14 8v6l4 2" stroke={c3} strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={s.singleBarLabel}>الساعات المكتملة</p>
+                      <p style={{ ...s.singleBarValue, color: c3 }}>{completedHours} / {totalHours} ساعة</p>
+                    </div>
+                    <div style={{ ...s.progressCircle, borderColor: c3, width: 44, height: 44 }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: c3 }}>{pctH}%</span>
+                    </div>
+                  </div>
+                  <div style={s.progressTrack}>
+                    <div style={{ ...s.progressFill, width: `${pctH}%`, background: `linear-gradient(90deg, ${c3}, ${c4})` }}>
+                      {pctH > 10 && <div style={s.progressShine}/>}
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 11, color: "#9AA3AF", margin: 0 }}>{totalHours - completedHours} ساعة متبقية</p>
                 </div>
               </div>
-
-              {/* Bottom row */}
-              <div style={s.progressSub}>
-                <span style={{ color }}>✓ {completed} مكتمل</span>
-                <span style={{ color: "#9AA3AF" }}>{total - completed} متبقي من {total}</span>
-              </div>
+              <style>{`
+                @keyframes barGrow1 { 0% { transform: scaleY(0.7); } 100% { transform: scaleY(1.15); } }
+                @keyframes barGrow2 { 0% { transform: scaleY(0.8); } 100% { transform: scaleY(1.1); } }
+                @keyframes barGrow3 { 0% { transform: scaleY(0.85); } 100% { transform: scaleY(1.08); } }
+                @keyframes starBounce { 0% { transform: translateY(2px) scale(0.9); } 100% { transform: translateY(-3px) scale(1.2); } }
+              `}</style>
             </div>
           );
         })()}
@@ -1173,6 +1210,17 @@ const s = {
   progressFill: { height: "100%", borderRadius: 99, transition: "width 1s cubic-bezier(.4,0,.2,1)", position: "relative", overflow: "hidden" },
   progressShine: { position: "absolute", top: 0, left: 0, right: 0, height: "50%", background: "rgba(255,255,255,0.25)", borderRadius: 99 },
   progressSub: { display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: "600" },
+
+  // Dual progress card
+  dualProgressCard: { backgroundColor: "#fff", border: "1px solid #E8ECF2", borderRadius: "16px", padding: "16px 20px", marginBottom: "18px", boxShadow: "0 2px 12px rgba(27,79,122,0.08)" },
+  dualProgressHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid #F0F2F5" },
+  dualProgressTitle: { fontSize: "14px", fontWeight: "700", color: "#1A2332" },
+  dualProgressMsg: { fontSize: "11px", color: "#9AA3AF" },
+  singleBar: { flex: 1, display: "flex", flexDirection: "column", gap: 8 },
+  singleBarTop: { display: "flex", alignItems: "center", gap: 10 },
+  singleBarLabel: { fontSize: "12px", fontWeight: "600", color: "#6B7280", margin: "0 0 2px" },
+  singleBarValue: { fontSize: "14px", fontWeight: "800", margin: 0 },
+  dualDivider: { width: 1, backgroundColor: "#F0F2F5", alignSelf: "stretch", margin: "0 4px" },
 
   // Mobile
   hamburger: {
