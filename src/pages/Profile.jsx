@@ -855,7 +855,6 @@ export default function Profile() {
               <DataRow label="الدرجة الحالية" value={data?.Levelname || "—"} highlightBlue />
               <DataRow label="سنة آخر ترقية" value={data?.date_level || "—"} highlightOrange />
               <DataRow label="المدير المباشر" value={manager?.ManagerName || "—"} />
-              <DataRow label="ر.ق المدير"    value={manager?.Manger_Nid  || "—"} />
               <DataRow
                 label="الجهة"
                 value={deptParts.length === 0 ? "—" : deptParts.join(" - ")}
@@ -865,7 +864,15 @@ export default function Profile() {
             <div style={s.card}>
               <div style={s.cardTitleRow}>
                 <h4 style={s.cardTitle}>بيانات مخفية</h4>
-                <button style={s.toggleCardBtn} onClick={() => setHiddenExpanded(!hiddenExpanded)}>
+                <button style={s.toggleCardBtn} onClick={() => {
+                  if (hiddenUnlocked) {
+                    setHiddenExpanded(!hiddenExpanded);
+                  } else {
+                    setHiddenExpanded(!hiddenExpanded);
+                    setHiddenPassword("");
+                    setHiddenPasswordError(false);
+                  }
+                }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
                     style={{ transform: hiddenExpanded ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
                     <polyline points="6 9 12 15 18 9"/>
@@ -873,8 +880,45 @@ export default function Profile() {
                   {hiddenExpanded ? "إخفاء" : "عرض"}
                 </button>
               </div>
-              {hiddenExpanded && (
+              {hiddenExpanded && !hiddenUnlocked && (
+                <div style={s.passwordPrompt}>
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: 8 }}>
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0110 0v4"/>
+                  </svg>
+                  <p style={s.passwordPromptText}>أدخل كلمة المرور للوصول إلى البيانات المخفية</p>
+                  <div style={s.passwordInputRow}>
+                    <input
+                      type="password"
+                      value={hiddenPassword}
+                      onChange={e => { setHiddenPassword(e.target.value); setHiddenPasswordError(false); }}
+                      onKeyDown={e => {
+                        if (e.key === "Enter") {
+                          if (hiddenPassword === "neamat123") { setHiddenUnlocked(true); setHiddenPasswordError(false); }
+                          else { setHiddenPasswordError(true); }
+                        }
+                      }}
+                      placeholder="كلمة المرور"
+                      style={{ ...s.passwordInput, borderColor: hiddenPasswordError ? "#EF4444" : "#D1D5DB" }}
+                    />
+                    <button
+                      style={s.passwordBtn}
+                      onClick={() => {
+                        if (hiddenPassword === "neamat123") { setHiddenUnlocked(true); setHiddenPasswordError(false); }
+                        else { setHiddenPasswordError(true); }
+                      }}
+                    >
+                      دخول
+                    </button>
+                  </div>
+                  {hiddenPasswordError && (
+                    <p style={s.passwordError}>كلمة المرور غير صحيحة</p>
+                  )}
+                </div>
+              )}
+              {hiddenExpanded && hiddenUnlocked && (
                 <>
+                  <DataRow label="ر.ق المدير"         value={manager?.Manger_Nid  || "—"} />
                   <DataRow label="كود الدرجة"         value={levelInfo.code} />
                   <DataRow label="المدة البينية"      value={levelInfo.duration.trim() + " سنوات"} />
                   <DataRow label="مستوى الوظيفة"     value={data?.CurrentJobLevel || "—"} />
@@ -1193,6 +1237,14 @@ const s = {
     fontSize: "11px", fontWeight: "600",
   },
   seeMoreBtn: { width: "100%", marginTop: "10px", padding: "8px", backgroundColor: "#EEF2FF", color: "#4338CA", border: "1px solid #C7D2FE", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: "700" },
+
+  // Password prompt
+  passwordPrompt: { display: "flex", flexDirection: "column", alignItems: "center", padding: "20px 12px", gap: "8px" },
+  passwordPromptText: { color: "#6B7280", fontSize: "12px", fontWeight: "600", margin: 0, textAlign: "center" },
+  passwordInputRow: { display: "flex", gap: "8px", width: "100%", maxWidth: "280px" },
+  passwordInput: { flex: 1, padding: "8px 12px", borderRadius: "8px", border: "1.5px solid #D1D5DB", fontSize: "13px", outline: "none", textAlign: "right", direction: "rtl", backgroundColor: "#F9FAFB" },
+  passwordBtn: { padding: "8px 16px", backgroundColor: "#1B4F7A", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: "700", whiteSpace: "nowrap" },
+  passwordError: { color: "#EF4444", fontSize: "11px", fontWeight: "600", margin: 0 },
 
   // Warning
   warningNote: { display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#FAEEDA", border: "1px solid #EF9F27", color: "#854F0B", padding: "10px 14px", borderRadius: "8px", fontSize: "12px", lineHeight: "1.6" },
