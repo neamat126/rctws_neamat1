@@ -783,8 +783,23 @@ export default function Profile() {
                       <p style={s.singleBarLabel}>البرامج المكتملة</p>
                       <p style={{ ...s.singleBarValue, color: c1 }}>{completed} / {total} برنامج</p>
                     </div>
-                    <div style={{ ...s.progressCircle, borderColor: c1, width: 44, height: 44 }}>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: c1 }}>{pct}%</span>
+                    {/* Circular progress ring */}
+                    <div style={{ position: "relative", width: 52, height: 52, flexShrink: 0 }}>
+                      <svg width="52" height="52" viewBox="0 0 52 52">
+                        {/* Background circle */}
+                        <circle cx="26" cy="26" r="22" fill="none" stroke="#E8ECF2" strokeWidth="4"/>
+                        {/* Progress arc */}
+                        <circle cx="26" cy="26" r="22" fill="none" stroke={c1} strokeWidth="4"
+                          strokeLinecap="round"
+                          strokeDasharray={`${2 * Math.PI * 22}`}
+                          strokeDashoffset={`${2 * Math.PI * 22 * (1 - pct / 100)}`}
+                          transform="rotate(-90 26 26)"
+                          style={{ transition: "stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)" }}
+                        />
+                      </svg>
+                      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: c1, lineHeight: 1 }}>{pct}%</span>
+                      </div>
                     </div>
                   </div>
                   <div style={s.progressTrack}>
@@ -811,8 +826,21 @@ export default function Profile() {
                       <p style={s.singleBarLabel}>الساعات المكتملة</p>
                       <p style={{ ...s.singleBarValue, color: c3 }}>{completedHours} / {totalHours} ساعة</p>
                     </div>
-                    <div style={{ ...s.progressCircle, borderColor: c3, width: 44, height: 44 }}>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: c3 }}>{pctH}%</span>
+                    {/* Circular progress ring — ساعات */}
+                    <div style={{ position: "relative", width: 52, height: 52, flexShrink: 0 }}>
+                      <svg width="52" height="52" viewBox="0 0 52 52">
+                        <circle cx="26" cy="26" r="22" fill="none" stroke="#E8ECF2" strokeWidth="4"/>
+                        <circle cx="26" cy="26" r="22" fill="none" stroke={c3} strokeWidth="4"
+                          strokeLinecap="round"
+                          strokeDasharray={`${2 * Math.PI * 22}`}
+                          strokeDashoffset={`${2 * Math.PI * 22 * (1 - pctH / 100)}`}
+                          transform="rotate(-90 26 26)"
+                          style={{ transition: "stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)" }}
+                        />
+                      </svg>
+                      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: c3, lineHeight: 1 }}>{pctH}%</span>
+                      </div>
                     </div>
                   </div>
                   <div style={s.progressTrack}>
