@@ -8,6 +8,7 @@ import Required from "./pages/Required";
 import Guide from "./pages/Guide";
 import ManagerRequests from "./pages/ManagerRequests";
 import Messages from "./pages/Messages";
+import Notifications from "./pages/Notifications";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/guide" element={<Guide />} />
         <Route path="/manager-requests" element={<ManagerRequests />} />
         <Route path="/settings" element={<Messages />} />
+        <Route path="/notifications" element={<Notifications />} />
         <Route path="/schedule" element={<Navigate to="/guide" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

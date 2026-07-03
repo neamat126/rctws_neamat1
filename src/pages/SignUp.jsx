@@ -25,7 +25,7 @@ export default function SignUp() {
     try {
       const userRef  = ref(db, `mmm/${nationalId}`);
       const snapshot = await get(userRef);
-      if (snapshot.exists()) { setError("الرقم القومي ده مسجل قبل كده"); setLoading(false); return; }
+      if (snapshot.exists()) { setError("الرقم القومي  مسجل من قبل "); setLoading(false); return; }
       await set(userRef, `${nationalId}-${password}`);
       localStorage.setItem("nationalId", nationalId);
       navigate("/profile");

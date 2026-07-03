@@ -11,6 +11,7 @@ import logo2 from "../assets/logo2.png";
 import logo3 from "../assets/logo3.png";
 import API_BASE from "../api";
 import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
+import { addNotification, getUnreadCount } from "../utils/notifications";
 
 const COURSE_IMAGES = { t: imgT, c: imgC, f: imgF, m: imgM, w: imgW };
 const getCourseImage = (code) => {
@@ -162,6 +163,7 @@ export default function Profile() {
   const [showReminderBanner, setShowReminderBanner] = useState(false);
   const [apiFailCount, setApiFailCount] = useState(0);
   const [apiDoneCount, setApiDoneCount] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const nationalId = localStorage.getItem("nationalId");
   const w = useWindowWidth();
   const mobile = isSmall(w);
@@ -266,10 +268,16 @@ export default function Profile() {
 
   // إشعار تذكير في شهر 7 و 10
   useEffect(() => {
-    const month = new Date().getMonth() + 1; // 1-12
+    const month = new Date().getMonth() + 1;
     if (month === 7 || month === 10) {
       const key = `reminder_dismissed_${new Date().getFullYear()}_${month}`;
       if (!localStorage.getItem(key)) {
+        // خزّن الإشعار في صفحة الإشعارات
+        addNotification({
+          title: "تذكير: تقديم طلبات البرامج التدريبية",
+          message: `تذكير بضرورة تقديم طلبات البرامج التدريبية قبل نهاية شهر ${month === 7 ? "يوليو" : "أكتوبر"}. يرجى المبادرة بتقديم طلباتك في أقرب وقت.`,
+          icon: "🔔",
+        });
         setShowReminderBanner(true);
       }
     }
@@ -337,12 +345,14 @@ export default function Profile() {
   const visiblePrograms = showAll ? programs : programs.slice(0, VISIBLE);
 
   const isManager = localStorage.getItem("isManager") === "1";
+  const unreadNotifs = getUnreadCount();
 
   const NAV_ITEMS = [
     { path: "/profile",  label: "الملف الشخصي",          icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>, section: "main" },
     { path: "/programs", label: "برامج تم الحصول عليها", icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><polyline points="9 11 11 13 15 9"/></svg>, badge: programs.length, section: "main" },
     { path: "/required", label: "البرامج المطلوبة",       icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><circle cx="12" cy="10" r="2"/><path d="M12 12v3"/></svg>, section: "main" },
     ...(isManager ? [{ path: "/manager-requests", label: "طلبات المهندسين", icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>, section: "main" }] : []),
+    { path: "/notifications", label: "الإشعارات", icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>, badge: unreadNotifs || undefined, section: "main" },
     { path: "/schedule", label: "كتيب اللائحة التدريبية", icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>, section: "other" },
     { path: "/settings", label: "الرسائل",              icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>, section: "other" },
   ];
