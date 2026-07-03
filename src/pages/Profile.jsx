@@ -282,6 +282,50 @@ export default function Profile() {
     fetchPrograms();
   }, [nationalId]);
 
+  // جيب البرامج المطلوبة في الـ background عشان progress bar يشتغل بدون زيارة Required
+  useEffect(() => {
+    const org_code     = localStorage.getItem("sectorCode");
+    const Degree       = localStorage.getItem("levelCode");
+    const Years_Remain = localStorage.getItem("actualYearsInPhase");
+    if (!org_code || !Degree || !nationalId) return;
+
+    // الـ key مربوط بالـ nationalId عشان مفيش تداخل بين users
+    const reqKey = `requiredCourseCodes_${nationalId}`;
+    if (localStorage.getItem(reqKey)) {
+      // موجود بالفعل — حط في الـ key العام عشان progress bar يقرأه
+      localStorage.setItem("requiredCourseCodes", localStorage.getItem(reqKey));
+      return;
+    }
+
+    const fetchRequired = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/courses_for_promotion`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ org_code, Degree, Years_Remain }),
+        });
+        if (!res.ok) return;
+        const d = await res.json();
+        const fundamental = d?.["Fundamental _courses"] || d?.Fundamental_courses || [];
+        const optional    = d?.Optional_courses || [];
+        const optRequired = d?.["No of Required optional courses"] || 0;
+
+        const fundamentalCodes = fundamental.map(c =>
+          (c.fundamental_course_code || "").trim().toLowerCase()
+        ).filter(Boolean);
+        const optionalCodes = optional.slice(0, optRequired).map(c =>
+          (c.optional_course_code || "").trim().toLowerCase()
+        ).filter(Boolean);
+
+        const allCodes = [...fundamentalCodes, ...optionalCodes];
+        // خزّن مربوط بالـ nationalId + الـ key العام
+        localStorage.setItem(reqKey, JSON.stringify(allCodes));
+        localStorage.setItem("requiredCourseCodes", JSON.stringify(allCodes));
+      } catch { /* silent */ }
+    };
+    fetchRequired();
+  }, [data]);
+
   useEffect(() => {
     if (!nationalId) return;
     const fetchManager = async () => {
@@ -336,7 +380,7 @@ export default function Profile() {
      "empname","Levelname","QualificationName","SpecializationName",
      "BirthDate","ActualHiringDate","Tel","concatenated_departments",
      "levelCode","levelDuration","year_remaining","completedCourseCodes",
-     "ManagerName","Manager_Nid","isManager"
+     "ManagerName","Manager_Nid","isManager","requiredCourseCodes"
     ].forEach(k => localStorage.removeItem(k));
     navigate("/");
   };
@@ -682,23 +726,47 @@ export default function Profile() {
             ? requiredCodes.filter(c => completedCodes.includes(c)).length
             : 0;
 
-          // لو مفيش required codes بعد → مش نعرض الـ bar
           if (total === 0) return null;
 
           const pct = Math.min(100, Math.round((completed / total) * 100));
+          const color  = pct >= 80 ? "#059669" : pct >= 50 ? "#D97706" : "#1B4F7A";
+          const color2 = pct >= 80 ? "#34D399" : pct >= 50 ? "#FCD34D" : "#60A5FA";
+          const emoji  = pct === 100 ? "🏆" : pct >= 80 ? "🌟" : pct >= 50 ? "📈" : "🎯";
+          const msg    = pct === 100 ? "أحسنت! أكملت جميع البرامج المطلوبة"
+                       : pct >= 80  ? "رائع! أوشكت على إتمام اللائحة"
+                       : pct >= 50  ? "استمر! أنجزت أكثر من النصف"
+                       : "ابدأ بتقديم طلبات البرامج المطلوبة";
           return (
             <div style={s.progressCard}>
+              {/* Top row */}
               <div style={s.progressHeader}>
-                <span style={s.progressTitle}>نسبة إنجاز اللائحة التدريبية</span>
-                <span style={s.progressPct}>{pct}%</span>
+                <div style={s.progressLabelGroup}>
+                  <span style={{ fontSize: 22 }}>{emoji}</span>
+                  <div>
+                    <p style={s.progressTitle}>نسبة إنجاز اللائحة التدريبية</p>
+                    <p style={s.progressMsg}>{msg}</p>
+                  </div>
+                </div>
+                <div style={{ ...s.progressCircle, borderColor: color }}>
+                  <span style={{ ...s.progressPct, color }}>{pct}%</span>
+                </div>
               </div>
+
+              {/* Bar */}
               <div style={s.progressTrack}>
-                <div style={{ ...s.progressFill, width: `${pct}%`,
-                  background: pct >= 80 ? "#059669" : pct >= 50 ? "#D97706" : "#1B4F7A" }} />
+                <div style={{
+                  ...s.progressFill,
+                  width: `${pct}%`,
+                  background: `linear-gradient(90deg, ${color} 0%, ${color2} 100%)`,
+                }}>
+                  {pct > 10 && <div style={s.progressShine} />}
+                </div>
               </div>
+
+              {/* Bottom row */}
               <div style={s.progressSub}>
-                <span>{completed} برنامج مكتمل</span>
-                <span>من أصل {total} برنامج مطلوب</span>
+                <span style={{ color }}>✓ {completed} مكتمل</span>
+                <span style={{ color: "#9AA3AF" }}>{total - completed} متبقي من {total}</span>
               </div>
             </div>
           );
@@ -1069,13 +1137,17 @@ const s = {
   warningNote: { display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#FAEEDA", border: "1px solid #EF9F27", color: "#854F0B", padding: "10px 14px", borderRadius: "8px", fontSize: "12px", lineHeight: "1.6" },
 
   // Progress bar
-  progressCard: { backgroundColor: "#fff", border: "1px solid #E8ECF2", borderRadius: "12px", padding: "14px 16px", marginBottom: "18px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" },
-  progressHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
-  progressTitle: { fontSize: "13px", fontWeight: "700", color: "#1A2332" },
-  progressPct: { fontSize: "18px", fontWeight: "800", color: "#1B4F7A" },
-  progressTrack: { height: 10, backgroundColor: "#E8ECF2", borderRadius: 99, overflow: "hidden", marginBottom: 8 },
-  progressFill: { height: "100%", borderRadius: 99, transition: "width 0.8s cubic-bezier(.4,0,.2,1)" },
-  progressSub: { display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#9AA3AF" },
+  progressCard: { backgroundColor: "#fff", border: "1px solid #E8ECF2", borderRadius: "16px", padding: "16px 20px", marginBottom: "18px", boxShadow: "0 2px 12px rgba(27,79,122,0.08)" },
+  progressHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
+  progressLabelGroup: { display: "flex", alignItems: "center", gap: "10px", flex: 1 },
+  progressTitle: { fontSize: "13px", fontWeight: "700", color: "#1A2332", margin: "0 0 2px" },
+  progressMsg: { fontSize: "11px", color: "#9AA3AF", margin: 0 },
+  progressCircle: { width: 52, height: 52, borderRadius: "50%", border: "3px solid", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  progressPct: { fontSize: "14px", fontWeight: "800" },
+  progressTrack: { height: 12, backgroundColor: "#F0F2F5", borderRadius: 99, overflow: "hidden", marginBottom: 10, position: "relative" },
+  progressFill: { height: "100%", borderRadius: 99, transition: "width 1s cubic-bezier(.4,0,.2,1)", position: "relative", overflow: "hidden" },
+  progressShine: { position: "absolute", top: 0, left: 0, right: 0, height: "50%", background: "rgba(255,255,255,0.25)", borderRadius: 99 },
+  progressSub: { display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: "600" },
 
   // Mobile
   hamburger: {
