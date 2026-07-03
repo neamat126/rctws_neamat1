@@ -159,6 +159,7 @@ export default function Profile() {
   const [hiddenExpanded, setHiddenExpanded] = useState(false);
   const [manager, setManager] = useState(null);
   const [showTrainingDialog, setShowTrainingDialog] = useState(false);
+  const [showReminderBanner, setShowReminderBanner] = useState(false);
   const [apiFailCount, setApiFailCount] = useState(0);
   const [apiDoneCount, setApiDoneCount] = useState(0);
   const nationalId = localStorage.getItem("nationalId");
@@ -262,6 +263,17 @@ export default function Profile() {
     };
     fetchManager();
   }, [nationalId]);
+
+  // إشعار تذكير في شهر 7 و 10
+  useEffect(() => {
+    const month = new Date().getMonth() + 1; // 1-12
+    if (month === 7 || month === 10) {
+      const key = `reminder_dismissed_${new Date().getFullYear()}_${month}`;
+      if (!localStorage.getItem(key)) {
+        setShowReminderBanner(true);
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
     ["nationalId","sectorCode","actualYearsInPhase","phaseStatus",
@@ -391,6 +403,46 @@ export default function Profile() {
                 style={{ ...s.blockBtn, background: "#6B7280", flex: 1, marginBottom: 0 }}
                 onClick={() => setShowTrainingDialog(false)}
               >Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reminder Banner — شهر 7 و 10 */}
+      {showReminderBanner && (
+        <div style={s.reminderOverlay}>
+          <div style={s.reminderPopup}>
+            <div style={s.reminderIconWrap}>
+              <span style={{ fontSize: 40 }}>🔔</span>
+            </div>
+            <h3 style={s.reminderTitle}>تذكير هام</h3>
+            <p style={s.reminderMsg}>
+              تذكير بضرورة تقديم طلبات البرامج التدريبية<br/>
+              <strong>قبل نهاية الشهر الحالي</strong><br/>
+              يرجى المبادرة بتقديم طلباتك في أقرب وقت
+            </p>
+            <div style={s.reminderBtns}>
+              <button
+                style={s.reminderBtnPrimary}
+                onClick={() => {
+                  setShowReminderBanner(false);
+                  const key = `reminder_dismissed_${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
+                  localStorage.setItem(key, "1");
+                  navigate("/required");
+                }}
+              >
+                تقديم الطلبات الآن
+              </button>
+              <button
+                style={s.reminderBtnSecondary}
+                onClick={() => {
+                  setShowReminderBanner(false);
+                  const key = `reminder_dismissed_${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
+                  localStorage.setItem(key, "1");
+                }}
+              >
+                لاحقاً
+              </button>
             </div>
           </div>
         </div>
@@ -985,4 +1037,55 @@ const s = {
     marginBottom: 14,
   },
   blockHint: { fontSize: 11, color: "#9CA3AF", margin: 0 },
+
+  // Reminder banner
+  reminderOverlay: {
+    position: "fixed", inset: 0,
+    background: "rgba(4,10,25,0.88)",
+    backdropFilter: "blur(4px)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    zIndex: 9998, direction: "rtl",
+  },
+  reminderPopup: {
+    background: "linear-gradient(145deg, #fff 0%, #fffbeb 100%)",
+    borderRadius: 24,
+    padding: "2.5rem 2rem 2rem",
+    maxWidth: 400, width: "90%",
+    textAlign: "center",
+    boxShadow: "0 30px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(251,191,36,0.3)",
+    animation: "fadeUp .4s cubic-bezier(.16,1,.3,1) both",
+    border: "1px solid #FDE68A",
+  },
+  reminderIconWrap: {
+    width: 80, height: 80, borderRadius: "50%",
+    background: "linear-gradient(135deg, #FEF3C7, #FDE68A)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    margin: "0 auto 1.25rem",
+  },
+  reminderTitle: {
+    fontSize: 20, fontWeight: 700, color: "#92400E",
+    margin: "0 0 12px",
+  },
+  reminderMsg: {
+    fontSize: 14, color: "#78350F", lineHeight: 1.9,
+    margin: "0 0 24px",
+  },
+  reminderBtns: {
+    display: "flex", gap: 10,
+  },
+  reminderBtnPrimary: {
+    flex: 1, padding: "12px",
+    background: "linear-gradient(135deg, #D97706, #F59E0B)",
+    color: "#fff", border: "none", borderRadius: 12,
+    fontSize: 14, fontWeight: 700, cursor: "pointer",
+    fontFamily: "inherit",
+    boxShadow: "0 4px 15px rgba(217,119,6,0.4)",
+  },
+  reminderBtnSecondary: {
+    flex: 1, padding: "12px",
+    background: "#fff", color: "#92400E",
+    border: "1.5px solid #FDE68A", borderRadius: 12,
+    fontSize: 14, fontWeight: 600, cursor: "pointer",
+    fontFamily: "inherit",
+  },
 };
