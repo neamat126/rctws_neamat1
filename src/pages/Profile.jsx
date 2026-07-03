@@ -732,8 +732,8 @@ export default function Profile() {
           const color  = pct >= 80 ? "#059669" : pct >= 50 ? "#D97706" : "#1B4F7A";
           const color2 = pct >= 80 ? "#34D399" : pct >= 50 ? "#FCD34D" : "#60A5FA";
           const emoji  = pct === 100 ? "🏆" : pct >= 80 ? "🌟" : pct >= 50 ? "📈" : "🎯";
-          const msg    = pct === 100 ? "أحسنت! أكملت جميع البرامج المطلوبة"
-                       : pct >= 80  ? "رائع! أوشكت على إتمام اللائحة"
+          const msg    = pct === 100 ? " أكملت جميع البرامج المطلوبة"
+                       : pct >= 80  ? " أوشكت على إتمام اللائحة"
                        : pct >= 50  ? "استمر! أنجزت أكثر من النصف"
                        : "ابدأ بتقديم طلبات البرامج المطلوبة";
           return (
@@ -741,7 +741,31 @@ export default function Profile() {
               {/* Top row */}
               <div style={s.progressHeader}>
                 <div style={s.progressLabelGroup}>
-                  <span style={{ fontSize: 22 }}>{emoji}</span>
+                  <div style={s.progressIconWrap}>
+                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* قاعدة */}
+                      <line x1="4" y1="32" x2="32" y2="32" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+                      {/* عمود 1 — قصير */}
+                      <rect x="6" y="24" width="6" height="8" rx="1.5" fill={color} opacity="0.4"
+                        style={{ animation: "barGrow1 1.4s ease-in-out infinite alternate", transformOrigin: "9px 32px" }}/>
+                      {/* عمود 2 — متوسط */}
+                      <rect x="15" y="18" width="6" height="14" rx="1.5" fill={color} opacity="0.7"
+                        style={{ animation: "barGrow2 1.4s ease-in-out infinite alternate", transformOrigin: "18px 32px" }}/>
+                      {/* عمود 3 — طويل */}
+                      <rect x="24" y="10" width="6" height="22" rx="1.5" fill={color}
+                        style={{ animation: "barGrow3 1.4s ease-in-out infinite alternate", transformOrigin: "27px 32px" }}/>
+                      {/* نجمة فوق العمود الأطول */}
+                      <g style={{ animation: "starBounce 1.4s ease-in-out infinite alternate", transformOrigin: "27px 7px" }}>
+                        <path d="M27 4l.8 2.4 2.5.2-1.9 1.7.6 2.4L27 9.4l-2 1.3.6-2.4-1.9-1.7 2.5-.2z" fill={color2}/>
+                      </g>
+                    </svg>
+                    <style>{`
+                      @keyframes barGrow1 { 0% { transform: scaleY(0.7); } 100% { transform: scaleY(1.15); } }
+                      @keyframes barGrow2 { 0% { transform: scaleY(0.8); } 100% { transform: scaleY(1.1); } animation-delay: 0.15s; }
+                      @keyframes barGrow3 { 0% { transform: scaleY(0.85); } 100% { transform: scaleY(1.08); } animation-delay: 0.3s; }
+                      @keyframes starBounce { 0% { transform: translateY(2px) scale(0.9); } 100% { transform: translateY(-3px) scale(1.2); } }
+                    `}</style>
+                  </div>
                   <div>
                     <p style={s.progressTitle}>نسبة إنجاز اللائحة التدريبية</p>
                     <p style={s.progressMsg}>{msg}</p>
@@ -1140,6 +1164,7 @@ const s = {
   progressCard: { backgroundColor: "#fff", border: "1px solid #E8ECF2", borderRadius: "16px", padding: "16px 20px", marginBottom: "18px", boxShadow: "0 2px 12px rgba(27,79,122,0.08)" },
   progressHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
   progressLabelGroup: { display: "flex", alignItems: "center", gap: "10px", flex: 1 },
+  progressIconWrap: { width: 50, height: 50, borderRadius: "14px", background: `linear-gradient(135deg, #EFF6FF, #DBEAFE)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 8px rgba(27,79,122,0.12)" },
   progressTitle: { fontSize: "13px", fontWeight: "700", color: "#1A2332", margin: "0 0 2px" },
   progressMsg: { fontSize: "11px", color: "#9AA3AF", margin: 0 },
   progressCircle: { width: 52, height: 52, borderRadius: "50%", border: "3px solid", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
