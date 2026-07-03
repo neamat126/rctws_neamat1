@@ -171,6 +171,23 @@ export default function Profile() {
   useEffect(() => {
     if (!nationalId) { navigate("/"); return; }
     const fetchData = async () => {
+      // ── Caching: لو البيانات موجودة ومش فاتت 30 دقيقة، استخدمها مباشرة ──
+      const cacheKey   = `profileData_${nationalId}`;
+      const cacheTime  = `profileDataTime_${nationalId}`;
+      const cached     = localStorage.getItem(cacheKey);
+      const cachedTime = localStorage.getItem(cacheTime);
+      const THIRTY_MIN = 30 * 60 * 1000;
+
+      if (cached && cachedTime && Date.now() - parseInt(cachedTime) < THIRTY_MIN) {
+        try {
+          const parsed = JSON.parse(cached);
+          setData(parsed);
+          setApiDoneCount(c => c + 1);
+          setLoading(false);
+          return;
+        } catch { /* مش valid JSON — نكمل الـ fetch */ }
+      }
+
       try {
         const res = await fetch(`${API_BASE}/api/GetDetails`, {
           method: "POST",
@@ -184,7 +201,11 @@ export default function Profile() {
           return;
         }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        setData(await res.json());
+        const json = await res.json();
+        setData(json);
+        // خزّن في الـ cache
+        localStorage.setItem(cacheKey, JSON.stringify(json));
+        localStorage.setItem(cacheTime, Date.now().toString());
       } catch {
         // 500 أو network error → افتح الصفحة ببيانات فاضية
         setData({});
@@ -222,6 +243,24 @@ export default function Profile() {
   useEffect(() => {
     if (!nationalId) return;
     const fetchPrograms = async () => {
+      // ── Caching للبرامج ──
+      const cacheKey  = `programs_${nationalId}`;
+      const cacheTime = `programsTime_${nationalId}`;
+      const cached    = localStorage.getItem(cacheKey);
+      const cachedTime = localStorage.getItem(cacheTime);
+      const THIRTY_MIN = 30 * 60 * 1000;
+
+      if (cached && cachedTime && Date.now() - parseInt(cachedTime) < THIRTY_MIN) {
+        try {
+          const arr = JSON.parse(cached);
+          setPrograms(arr);
+          const codes = arr.map(p => (p.course_ID || p.course_id || "").trim().toLowerCase()).filter(Boolean);
+          localStorage.setItem("completedCourseCodes", JSON.stringify(codes));
+          setApiDoneCount(c => c + 1);
+          return;
+        } catch { /* نكمل الـ fetch */ }
+      }
+
       try {
         const res = await fetch(`${API_BASE}/api/getData`, {
           method: "POST",
@@ -232,9 +271,11 @@ export default function Profile() {
         const json = await res.json();
         const arr = Array.isArray(json) ? json : json.data || [];
         setPrograms(arr);
-        // خزن أكواد البرامج المكتملة
         const codes = arr.map(p => (p.course_ID || p.course_id || "").trim().toLowerCase()).filter(Boolean);
         localStorage.setItem("completedCourseCodes", JSON.stringify(codes));
+        // خزّن في الـ cache
+        localStorage.setItem(cacheKey, JSON.stringify(arr));
+        localStorage.setItem(cacheTime, Date.now().toString());
       } catch (e) { console.error("Programs fetch error:", e); setApiFailCount(c => c + 1); }
       setApiDoneCount(c => c + 1);
     };
@@ -632,6 +673,37 @@ export default function Profile() {
           <StatCard icon="org"   label="الجهة المستوى الاول"    value={parentOrg}   color="#2563EB" small />
         </div>
 
+        {/* Progress Bar — نسبة إنجاز اللائحة */}
+        {(() => {
+          const requiredCodes  = JSON.parse(localStorage.getItem("requiredCourseCodes") || "[]");
+          const completedCodes = JSON.parse(localStorage.getItem("completedCourseCodes") || "[]");
+          const total     = requiredCodes.length;
+          const completed = total > 0
+            ? requiredCodes.filter(c => completedCodes.includes(c)).length
+            : 0;
+
+          // لو مفيش required codes بعد → مش نعرض الـ bar
+          if (total === 0) return null;
+
+          const pct = Math.min(100, Math.round((completed / total) * 100));
+          return (
+            <div style={s.progressCard}>
+              <div style={s.progressHeader}>
+                <span style={s.progressTitle}>نسبة إنجاز اللائحة التدريبية</span>
+                <span style={s.progressPct}>{pct}%</span>
+              </div>
+              <div style={s.progressTrack}>
+                <div style={{ ...s.progressFill, width: `${pct}%`,
+                  background: pct >= 80 ? "#059669" : pct >= 50 ? "#D97706" : "#1B4F7A" }} />
+              </div>
+              <div style={s.progressSub}>
+                <span>{completed} برنامج مكتمل</span>
+                <span>من أصل {total} برنامج مطلوب</span>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Two columns */}
         <div style={{ ...s.twoColumn, gridTemplateColumns: mobile ? "1fr" : "1fr 1fr" }}>
           {/* Left */}
@@ -995,6 +1067,15 @@ const s = {
 
   // Warning
   warningNote: { display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#FAEEDA", border: "1px solid #EF9F27", color: "#854F0B", padding: "10px 14px", borderRadius: "8px", fontSize: "12px", lineHeight: "1.6" },
+
+  // Progress bar
+  progressCard: { backgroundColor: "#fff", border: "1px solid #E8ECF2", borderRadius: "12px", padding: "14px 16px", marginBottom: "18px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" },
+  progressHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
+  progressTitle: { fontSize: "13px", fontWeight: "700", color: "#1A2332" },
+  progressPct: { fontSize: "18px", fontWeight: "800", color: "#1B4F7A" },
+  progressTrack: { height: 10, backgroundColor: "#E8ECF2", borderRadius: 99, overflow: "hidden", marginBottom: 8 },
+  progressFill: { height: "100%", borderRadius: 99, transition: "width 0.8s cubic-bezier(.4,0,.2,1)" },
+  progressSub: { display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#9AA3AF" },
 
   // Mobile
   hamburger: {

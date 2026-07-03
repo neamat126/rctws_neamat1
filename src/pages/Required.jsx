@@ -73,6 +73,21 @@ export default function Required() {
   const ministryList = fundamental.filter(c => c.Requirement === "M");
   const sectorList   = fundamental.filter(c => c.Requirement === "O");
 
+  // خزّن كل أكواد البرامج المطلوبة عشان progress bar في Profile
+  if (fundamental.length > 0) {
+    const fundamentalCodes = fundamental.map(c =>
+      (c.fundamental_course_code || "").trim().toLowerCase()
+    ).filter(Boolean);
+
+    // أضيف أول optRequired برنامج من الاختياري
+    const optionalCodes = optional.slice(0, optRequired).map(c =>
+      (c.optional_course_code || "").trim().toLowerCase()
+    ).filter(Boolean);
+
+    const allCodes = [...fundamentalCodes, ...optionalCodes];
+    localStorage.setItem("requiredCourseCodes", JSON.stringify(allCodes));
+  }
+
   // actual years remaining — لو 0 أو مش موجود نحط 1 عشان منقسمش على صفر
   const actualYears = Math.max(1, parseInt(localStorage.getItem("actualYearsInPhase")) || 1);
 
