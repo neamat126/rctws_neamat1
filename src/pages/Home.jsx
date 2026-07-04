@@ -54,9 +54,9 @@ export default function Home() {
       {/* NAV */}
       <nav ref={navRef}>
         <div className="logos-zone" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-          <img src={logo1} className="logo-img" alt="logo 1" />
-          <div className="sep" />
           <img src={logo2} className="logo-img" alt="logo 2" />
+          <div className="sep" />
+          <img src={logo1} className="logo-img" alt="logo 1" />
           <div className="sep" />
           <img src={logo3} className="logo-img" alt="logo 3" />
           <div className="sep" />

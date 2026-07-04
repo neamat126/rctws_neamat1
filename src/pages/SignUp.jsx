@@ -60,9 +60,9 @@ export default function SignUp() {
       <header style={s.header}>
         <div style={{ ...s.headerInner, padding: mobile ? ".75rem 1rem" : "1rem 2.5rem" }}>
           <div style={{ ...s.logosRow, cursor: "pointer" }} onClick={() => navigate("/")}>
-            <img src={logo1} alt="logo1" style={{ ...s.logo, height: mobile ? "36px" : "60px" }} />
-            <div style={s.vline} />
             <img src={logo2} alt="logo2" style={{ ...s.logo, height: mobile ? "36px" : "60px" }} />
+            <div style={s.vline} />
+            <img src={logo1} alt="logo1" style={{ ...s.logo, height: mobile ? "36px" : "60px" }} />
             {!mobile && <><div style={s.vline} /><img src={logo3} alt="logo3" style={s.logo} /></>}
           </div>
           <div style={s.titleBlock}>
