@@ -78,6 +78,34 @@ export default function Sidebar({ empname, levelname, programs = [], onRequiredC
 
       {/* Sidebar */}
       <aside style={{ ...s.sidebar, width: sidebarW, display: mobile && !sidebarOpen ? "none" : "flex" }}>
+        {/* Curved concave connector على جانب الـ sidebar */}
+        {!mobile && !collapsed && (
+          <div style={{
+            position: "absolute",
+            left: "-30px",
+            top: "40%",
+            transform: "translateY(-50%)",
+            zIndex: 101,
+            pointerEvents: "none",
+            width: 30,
+            height: 160,
+          }}>
+            <svg width="30" height="160" viewBox="0 0 30 160" fill="none">
+              {/* الشكل المنحني */}
+              <path
+                d="M30 0 L30 160 Q0 80 30 0Z"
+                fill="#041d52"
+              />
+              {/* shadow effect */}
+              <path
+                d="M30 0 Q0 80 30 160"
+                stroke="rgba(0,0,0,0.2)"
+                strokeWidth="1"
+                fill="none"
+              />
+            </svg>
+          </div>
+        )}
 
         {/* Collapse toggle */}
         {!mobile && (
@@ -183,7 +211,7 @@ export function useSidebarWidth() {
 const s = {
   hamburger: { position: "fixed", top: "12px", right: "12px", zIndex: 200, width: "40px", height: "40px", borderRadius: "10px", backgroundColor: "#041d52", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" },
   overlay:   { position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", zIndex: 99 },
-  sidebar:   { position: "fixed", right: 0, top: 0, height: "100vh", backgroundColor: "#041d52", display: "flex", flexDirection: "column", overflowY: "auto", overflowX: "hidden", zIndex: 100, boxShadow: "-2px 0 20px rgba(0,0,0,0.3)", transition: "width 0.22s cubic-bezier(.4,0,.2,1)" },
+  sidebar:   { position: "fixed", right: 0, top: 0, height: "100vh", backgroundColor: "#041d52", display: "flex", flexDirection: "column", overflowY: "auto", overflowX: "visible", zIndex: 100, boxShadow: "-2px 0 20px rgba(0,0,0,0.3)", transition: "width 0.22s cubic-bezier(.4,0,.2,1)" },
   collapseBtn: { alignSelf: "flex-end", margin: "12px 10px 4px", width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
   avatarSection: { textAlign: "center", padding: "16px 16px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)" },
   avatarWrap: { position: "relative", width: "72px", margin: "0 auto 12px", display: "inline-block" },

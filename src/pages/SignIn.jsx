@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase/config";
 import { ref, get } from "firebase/database";
@@ -7,6 +7,7 @@ import logo2 from "../assets/logo2.png";
 import logo3 from "../assets/logo3.png";
 import avatar2 from "../assets/avatar2.png";
 import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
+import { gsap } from "gsap";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -17,6 +18,28 @@ export default function SignIn() {
   const [loading, setLoading]       = useState(false);
   const w = useWindowWidth();
   const mobile = isSmall(w);
+
+  const cardRef    = useRef(null);
+  const leftRef    = useRef(null);
+
+  useEffect(() => {
+    // كارد يظهر
+    gsap.fromTo(cardRef.current,
+      { y: 40, opacity: 0, scale: 0.97 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: "power3.out", delay: 0.2 }
+    );
+    // النصوص في الـ left panel تيجي من اليمين
+    if (leftRef.current) {
+      gsap.fromTo(leftRef.current.querySelectorAll(".anim-text"),
+        { x: 40, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.55, ease: "power3.out", stagger: 0.1, delay: 0.3 }
+      );
+    }
+  }, []);
+
+  const animBtn = (e) => gsap.fromTo(e.currentTarget,
+    { scale: 0.93 }, { scale: 1, duration: 0.3, ease: "back.out(2)" }
+  );
 
   const handleLogin = async () => {
     if (!nationalId || !password) { setError("من فضلك ادخل الرقم القومي وكلمة السر"); return; }
@@ -31,7 +54,7 @@ export default function SignIn() {
         if (stored === password || part === password) {
           localStorage.setItem("nationalId", nationalId);
           navigate("/profile");
-        } else { setError("كلمة السر خطأ"); }
+        } else { setError("كلمة السر خطأ تواصل على الاميل rctwsrctws.gamil.com أو info@rctws.gov.eg"); }
       } else { setError("الرقم القومي غير موجود، سجل أولاً"); }
     } catch (e) { setError("حصل خطأ: " + e.message); }
     setLoading(false);
@@ -78,7 +101,7 @@ export default function SignIn() {
         ) : (
           /* Desktop: اللفت بانيل الكامل */
           <div style={s.leftPanel}>
-            <div style={s.leftContent}>
+            <div style={s.leftContent} ref={leftRef}>
               <div style={s.illustWrap}>
                 <div style={s.illustRing1} />
                 <div style={s.illustRing2} />
@@ -91,16 +114,16 @@ export default function SignIn() {
                   </svg>
                 </div>
               </div>
-              <h2 style={s.panelTitle}>اللائحة التدريبية للعاملين <br/>بوزارة الموارد المائية و الري</h2>
-              <p style={s.panelSub}>MWRI Promotion System</p>
-              <div style={s.dividerLine} />
-              <p style={s.panelDesc}>
+              <h2 className="anim-text" style={s.panelTitle}>اللائحة التدريبية للعاملين <br/>بوزارة الموارد المائية و الري</h2>
+              <p className="anim-text" style={s.panelSub}>MWRI Promotion System</p>
+              <div className="anim-text" style={s.dividerLine} />
+              <p className="anim-text" style={s.panelDesc}>
                 منصة رقمية متكاملة لمتابعة مسار البرامج اللائحة التدريبية<br/>
                 وإدارة البرامج التدريبية الإلزامية
               </p>
               <div style={s.featureList}>
                 {["متابعة طلبات البرامج اللائحة التدريبية", "البرامج التدريبية الإلزامية", "الملف الوظيفي الرقمي"].map((f, i) => (
-                  <div key={i} style={s.featureItem}>
+                  <div key={i} className="anim-text" style={s.featureItem}>
                     <span style={s.featureDot} />
                     <span>{f}</span>
                   </div>
@@ -112,7 +135,7 @@ export default function SignIn() {
 
         {/* ── الكارد — نفس التصميم على الموبايل والديسكتوب ── */}
         <div style={{ ...s.rightPanel, padding: mobile ? "1rem" : "2.5rem", width: mobile ? "100%" : "auto" }}>
-          <div style={{ ...s.card, maxWidth: mobile ? "100%" : 420, boxShadow: mobile ? "0 2px 16px rgba(27,79,122,.1)" : "0 4px 24px rgba(27,79,122,.08)" }}>
+          <div ref={cardRef} style={{ ...s.card, maxWidth: mobile ? "100%" : 420, boxShadow: mobile ? "0 2px 16px rgba(27,79,122,.1)" : "0 4px 24px rgba(27,79,122,.08)" }}>
             <div style={s.cardHeader}>
               <div style={s.cardIcon}>
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
@@ -176,7 +199,7 @@ export default function SignIn() {
                 </div>
               )}
 
-              <button style={{ ...s.submitBtn, opacity: loading ? .7 : 1 }} onClick={handleLogin} disabled={loading}>
+              <button style={{ ...s.submitBtn, opacity: loading ? .7 : 1 }} onClick={(e) => { animBtn(e); handleLogin(); }} disabled={loading}>
                 {loading ? <><span style={s.spinner} /> جارٍ التحقق...</> : "دخول"}
               </button>
 

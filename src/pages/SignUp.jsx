@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase/config";
 import { ref, set, get } from "firebase/database";
@@ -9,6 +9,7 @@ import avatar  from "../assets/avatar.png";
 import avatar2 from "../assets/avatar2.png";
 import avatar3 from "../assets/avatar3.jpg";
 import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
+import { gsap } from "gsap";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -18,6 +19,26 @@ export default function SignUp() {
   const [loading, setLoading]       = useState(false);
   const w = useWindowWidth();
   const mobile = isSmall(w);
+
+  const cardRef = useRef(null);
+  const leftRef = useRef(null);
+
+  useEffect(() => {
+    gsap.fromTo(cardRef.current,
+      { y: 40, opacity: 0, scale: 0.97 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: "power3.out", delay: 0.2 }
+    );
+    if (leftRef.current) {
+      gsap.fromTo(leftRef.current.querySelectorAll(".anim-text"),
+        { x: 40, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.55, ease: "power3.out", stagger: 0.1, delay: 0.3 }
+      );
+    }
+  }, []);
+
+  const animBtn = (e) => gsap.fromTo(e.currentTarget,
+    { scale: 0.93 }, { scale: 1, duration: 0.3, ease: "back.out(2)" }
+  );
 
   const handleSignUp = async () => {
     if (!nationalId || !password) { setError("من فضلك ادخل الرقم القومي وكلمة السر"); return; }
@@ -76,9 +97,9 @@ export default function SignUp() {
         ) : (
           /* Desktop left panel */
         <div style={s.leftPanel}>
-          <div style={s.leftContent}>
+          <div style={s.leftContent} ref={leftRef}>
 
-            <div style={s.avatarsRow}>
+            <div className="anim-text" style={s.avatarsRow}>
               <img src={avatar3} alt="u" style={{...s.av, zIndex:1, animation:"floatAvatar 4s .6s ease-in-out infinite"}} />
               <img src={avatar2} alt="u" style={{...s.av, zIndex:2, marginRight:-24, animation:"floatAvatar 4s .3s ease-in-out infinite"}} />
               <img src={avatar}  alt="u" style={{...s.av, zIndex:3, marginRight:-24, animation:"floatAvatar 4s 0s ease-in-out infinite"}} />
@@ -90,16 +111,15 @@ export default function SignUp() {
                 </svg>
               </div>
             </div>
-            <p style={s.avCaption}>موظف مسجّل في المنصة</p>
-
-            <h2 style={s.panelTitle}>انضم إلى منصة اللائحة التدريبية</h2>
-            <p style={s.panelSub}>MWRI Promotion System</p>
-            <div style={s.dividerLine} />
-            <p style={s.panelDesc}>سجّل ببياناتك الوظيفية وابدأ<br/>متابعة مسار ترقيتك فوراً</p>
+            <p className="anim-text" style={s.avCaption}>موظف مسجّل في المنصة</p>
+            <h2 className="anim-text" style={s.panelTitle}>انضم إلى منصة اللائحة التدريبية</h2>
+            <p className="anim-text" style={s.panelSub}>MWRI Promotion System</p>
+            <div className="anim-text" style={s.dividerLine} />
+            <p className="anim-text" style={s.panelDesc}>سجّل ببياناتك الوظيفية وابدأ<br/>متابعة مسار ترقيتك فوراً</p>
 
             <div style={s.stepsBlock}>
               {[{n:"١",t:"أدخل رقمك القومي"},{n:"٢",t:"اختر كلمة مرور"},{n:"٣",t:"ابدأ استخدام المنصة"}].map(step => (
-                <div key={step.n} style={s.stepItem}>
+                <div key={step.n} className="anim-text" style={s.stepItem}>
                   <span style={s.stepNum}>{step.n}</span>
                   <span style={s.stepText}>{step.t}</span>
                 </div>
@@ -109,7 +129,7 @@ export default function SignUp() {
         </div>
         )}
 
-        <div style={{ ...s.rightPanel, padding: mobile ? "1rem" : "2.5rem", width: mobile ? "100%" : "auto" }}>
+        <div ref={cardRef} style={{ ...s.rightPanel, padding: mobile ? "1rem" : "2.5rem", width: mobile ? "100%" : "auto" }}>
           <div style={s.card}>
             <div style={s.cardHeader}>
               <div style={s.cardIcon}>
@@ -159,7 +179,7 @@ export default function SignUp() {
                 </div>
               )}
 
-              <button style={{...s.submitBtn, opacity: loading ? .7 : 1}} onClick={handleSignUp} disabled={loading}>
+              <button style={{...s.submitBtn, opacity: loading ? .7 : 1}} onClick={(e) => { animBtn(e); handleSignUp(); }} disabled={loading}>
                 {loading ? <><span style={s.spinner}/> جارٍ التسجيل...</> : "إنشاء الحساب"}
               </button>
 

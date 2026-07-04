@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import logo1 from "../assets/logo1.png";
 import logo2 from "../assets/logo2.png";
@@ -8,15 +8,51 @@ import icon2 from "../assets/avatar2.png";
 import icon3 from "../assets/avatar3.jpg";
 import heroAvatar from "../assets/avatar.png";
 import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
+import { gsap } from "gsap";
 
 export default function Home() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("signin");
+  const w      = useWindowWidth();
+  const mobile = isSmall(w);
+
+  const navRef   = useRef(null);
+  const heroLRef = useRef(null);
+  const heroRRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.fromTo(navRef.current,   { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55 })
+        .fromTo(heroLRef.current, { x: 50, opacity: 0 },  { x: 0, opacity: 1, duration: 0.65 }, "-=0.2")
+        .fromTo(heroRRef.current, { x: -50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.65 }, "-=0.5")
+        // النصوص في الـ hero-text تيجي بـ stagger من اليمين
+        .fromTo(".hero-text .tag, .hero-text .h1, .hero-text .sub",
+          { x: 40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.5, stagger: 0.12 }, "-=0.4"
+        )
+        // الزراير
+        .fromTo(".hero-text .btns .bp, .hero-text .btns .bg2",
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, stagger: 0.1 }, "-=0.2"
+        )
+        .fromTo(".step", { y: 35, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, stagger: 0.12 }, "-=0.3");
+    });
+    return () => ctx.revert();
+  }, []);
+
+  // زرار click animation
+  const animBtn = (e) => {
+    gsap.fromTo(e.currentTarget,
+      { scale: 0.94 },
+      { scale: 1, duration: 0.25, ease: "back.out(2)" }
+    );
+  };
 
   return (
     <div className="page">
       {/* NAV */}
-      <nav>
+      <nav ref={navRef}>
         <div className="logos-zone" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
           <img src={logo1} className="logo-img" alt="logo 1" />
           <div className="sep" />
@@ -30,15 +66,15 @@ export default function Home() {
           </div>
         </div>
         <div className="nav-btns">
-          <button className="btn-o" onClick={() => navigate("/signin")}>تسجيل الدخول</button>
-          <button className="btn-s" onClick={() => navigate("/signup")}>إنشاء حساب</button>
+          <button className="btn-o" onClick={(e) => { animBtn(e); navigate("/signin"); }}>تسجيل الدخول</button>
+          <button className="btn-s" onClick={(e) => { animBtn(e); navigate("/signup"); }}>إنشاء حساب</button>
         </div>
       </nav>
 
       {/* HERO */}
       <div className="hero">
         {/* Left — blue panel */}
-        <div className="hero-l">
+        <div className="hero-l" ref={heroLRef}>
           <svg className="bg-svg" viewBox="0 0 420 400" preserveAspectRatio="none">
             <circle cx="380" cy="50" r="120" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1"
               strokeDasharray="700" strokeDashoffset="700"
@@ -58,8 +94,8 @@ export default function Home() {
               <h1 className="h1">اللائحة <span className="hl"> التدريبية</span>  للعاملين  <br/><span >بوزارة الموارد المائية والري</span></h1> <br/>
               <p className="sub">اطلب برامجك التدريبية من خلال المنصة<br />وقدم طلباتك على المنصة </p>
               <div className="btns">
-                <button className="bp" onClick={() => navigate("/signup")}>إنشاء حساب</button>
-                <button className="bg2" onClick={() => navigate("/signin")}>تسجيل الدخول</button>
+                <button className="bp" onClick={(e) => { animBtn(e); navigate("/signup"); }}>إنشاء حساب</button>
+                <button className="bg2" onClick={(e) => { animBtn(e); navigate("/signin"); }}>تسجيل الدخول</button>
               </div>
             </div>
 
@@ -80,7 +116,7 @@ export default function Home() {
         </div>
 
         {/* Right — floating card */}
-        <div className="hero-r">
+        <div className="hero-r" ref={heroRRef}>
           <div className="panel">
             <div className="tabs">
               <button className={`tab${activeTab === "signin" ? " active" : ""}`} onClick={() => setActiveTab("signin")}>تسجيل الدخول</button>
