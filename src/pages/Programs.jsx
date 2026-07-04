@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import imgT from "../assets/t.png";
 import imgC from "../assets/c.png";
@@ -25,7 +25,7 @@ export default function Programs() {
   const levelname   = localStorage.getItem("Levelname") || "";
   const w           = useWindowWidth();
   const mobile      = isSmall(w);
-  const sidebarW    = mobile ? "0px" : "240px";
+  const sidebarW  = mobile ? "0px" : "260px";
 
   const handleLogout = () => { localStorage.clear(); navigate("/"); };
 
@@ -109,3 +109,4 @@ const s = {
   spinner:    { width: 32, height: 32, border: "3px solid #E3E8EF", borderTop: "3px solid #0C447C", borderRadius: "50%", animation: "spin 0.8s linear infinite" },
   loadingText:{ color: "#0C447C", fontWeight: 600 },
 };
+

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+﻿import { useNavigate } from "react-router-dom";
 import logo1 from "../assets/logo1.png";
 import logo2 from "../assets/logo2.png";
 import logo3 from "../assets/logo3.png";
@@ -11,7 +11,7 @@ export default function Guide() {
   const mobile    = isSmall(w);
   const empname   = localStorage.getItem("empname") || "";
   const levelname = localStorage.getItem("Levelname") || "";
-  const sidebarW  = mobile ? "0px" : "240px";
+  const sidebarW  = mobile ? "0px" : "260px";
 
   const handleLogout = () => { localStorage.clear(); navigate("/"); };
 
@@ -101,3 +101,4 @@ const s = {
     display: "block",
   },
 };
+

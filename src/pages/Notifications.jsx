@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+﻿import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 
@@ -25,7 +25,7 @@ export default function Notifications() {
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
-  const sidebarW = mobile ? "0px" : "240px";
+  const sidebarW  = mobile ? "0px" : "260px";
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f4f6fa", direction: "rtl" }}>
@@ -90,3 +90,4 @@ const s = {
   cardDate: { fontSize: "11px", color: "#9AA3AF" },
   unreadDot: { width: 10, height: 10, borderRadius: "50%", backgroundColor: "#F59E0B", flexShrink: 0, marginTop: 4 },
 };
+

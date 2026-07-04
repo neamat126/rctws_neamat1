@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+﻿import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 
@@ -8,7 +8,7 @@ export default function Messages() {
   const mobile    = isSmall(w);
   const empname   = localStorage.getItem("empname") || "";
   const levelname = localStorage.getItem("Levelname") || "";
-  const sidebarW  = mobile ? "0px" : "240px";
+  const sidebarW  = mobile ? "0px" : "260px";
 
   const handleLogout = () => { localStorage.clear(); navigate("/"); };
 
@@ -39,3 +39,4 @@ const s = {
   sub:   { fontSize: 14, color: "#1B4F7A", fontWeight: 600, margin: "0 0 8px" },
   desc:  { fontSize: 13, color: "#9AA3AF", margin: "0 0 2rem", lineHeight: 1.7 },
 };
+
