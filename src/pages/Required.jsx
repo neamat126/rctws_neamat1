@@ -35,10 +35,11 @@ export default function Required() {
   const [error, setError]     = useState("");
   const [activeTab, setActiveTab] = useState("ministry");
 
-  const org_code     = localStorage.getItem("sectorCode");
-  const Degree       = localStorage.getItem("levelCode");
-  const Years_Remain = localStorage.getItem("actualYearsInPhase");
-  const empname      = localStorage.getItem("empname");
+  const org_code      = localStorage.getItem("sectorCode");
+  const Degree        = localStorage.getItem("levelCode");
+  const Years_Remain  = localStorage.getItem("actualYearsInPhase");
+  const year_remaining = localStorage.getItem("year_remaining");
+  const empname       = localStorage.getItem("empname");
   const w = useWindowWidth();
   const mobile = isSmall(w);
 
@@ -100,8 +101,17 @@ export default function Required() {
     localStorage.setItem("requiredTotalHours", totalHours.toString());
   }
 
-  // actual years remaining — لو 0 أو مش موجود نحط 1 عشان منقسمش على صفر
+  // actualYears — للمعادلة اللي بتحدد إيه البرامج اللي بتظهر (من API courses_for_promotion)
   const actualYears = Math.max(1, parseInt(localStorage.getItem("actualYearsInPhase")) || 1);
+
+  // yearsForDivision — للقسمة بس (كام برنامج في السنة) → year_remaining من الـ API
+  // لو مش موجود نرجع على actualYears كـ fallback
+  // لو كود الدرجة 2a نزود 1 على السنين
+  const yearsForDivision = Math.max(
+    1,
+    (parseInt(localStorage.getItem("year_remaining")) || actualYears) +
+    (Degree?.trim() === "2a" ? 1 : 0)
+  );
 
   const TABS = [
     { key: "ministry", label: "متطلبات وزارة", count: ministryList.length, color: "#1D4ED8" },
@@ -111,13 +121,18 @@ export default function Required() {
   ];
 
   const [subView, setSubView] = useState("all");
+  const [debugUnlocked, setDebugUnlocked] = useState(false);
+  const [debugPass, setDebugPass]         = useState("");
+  const [debugExpanded, setDebugExpanded] = useState(false);
+  const [debugPassError, setDebugPassError] = useState(false);
+  const DEBUG_PASS = "neamat123";
 
   const currentList =
     activeTab === "ministry" ? ministryList :
     activeTab === "sector"   ? sectorList   : optional;
 
   // عدد البرامج المطلوبة في السنة = ceil(total / actualYears)
-  const perYear = Math.ceil(currentList.length / actualYears);
+  const perYear = Math.ceil(currentList.length / yearsForDivision);
   const displayList = subView === "required" ? currentList.slice(0, perYear) : currentList;
 
   const getCode = (c) => c.fundamental_course_code || c.optional_course_code || "—";
@@ -141,9 +156,6 @@ export default function Required() {
 
       {/* Params */}
       <div style={s.paramsRow}>
-        <Chip label="كود القطاع"   value={org_code} />
-        <Chip label="كود الدرجة"   value={Degree} />
-        <Chip label="السنوات الفعلية" value={Years_Remain + " سنوات"} />
       </div>
 
       {loading ? (
@@ -222,12 +234,72 @@ export default function Required() {
           )}
         </>
       )}
+
+      {/* ── بيانات تقنية مخفية — ثابتة في أسفل الشاشة ── */}
+      <div style={{ position: "fixed", bottom: "14px", left: "14px", zIndex: 999 }}>
+        <button
+          style={s.debugToggleBtn}
+          onClick={() => setDebugExpanded(!debugExpanded)}
+          title="بيانات تقنية"
+        >
+          !
+        </button>
+
+        {debugExpanded && (
+          <div style={{ ...s.debugPanel, position: "absolute", bottom: "36px", left: 0, minWidth: "260px", marginTop: 0 }}>
+            {!debugUnlocked ? (
+              <div style={s.debugLockRow}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9AA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input
+                  type="password"
+                  placeholder="كلمة المرور"
+                  value={debugPass}
+                  onChange={e => { setDebugPass(e.target.value); setDebugPassError(false); }}
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      if (debugPass === DEBUG_PASS) { setDebugUnlocked(true); setDebugPassError(false); }
+                      else setDebugPassError(true);
+                    }
+                  }}
+                  style={{ ...s.debugPassInput, borderColor: debugPassError ? "#E24B4A" : "#E8ECF2" }}
+                />
+                <button
+                  style={s.debugPassBtn}
+                  onClick={() => {
+                    if (debugPass === DEBUG_PASS) { setDebugUnlocked(true); setDebugPassError(false); }
+                    else setDebugPassError(true);
+                  }}
+                >دخول</button>
+                {debugPassError && <span style={{ fontSize: 11, color: "#E24B4A" }}>✗</span>}
+              </div>
+            ) : (
+              <div style={s.debugChipsRow}>
+                <Chip label="كود القطاع"       value={org_code} />
+                <Chip label="كود الدرجة"       value={Degree} />
+                <Chip label="السنوات الفعلية"  value={Years_Remain + " سنوات"} />
+                <Chip label="السنوات المتبقية" value={(year_remaining ?? "—") + " سنوات"} color="#059669" />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
 
-function Chip({ label, value }) {
-  return <span style={s.chip}>{label}: <b>{value}</b></span>;
+function Chip({ label, value, color }) {
+  return (
+    <span style={{
+      ...s.chip,
+      ...(color ? { borderColor: color + "55", color: color } : {}),
+    }}>
+      {label}: <b>{value}</b>
+    </span>
+  );
 }
 
 function CourseCard({ name, code, hours, type, courseData, subView }) {
@@ -479,4 +551,12 @@ const s = {
   subTabCountActive: { backgroundColor: "rgba(255,255,255,0.2)", color: "#fff" },
   spinner: { width: 32, height: 32, border: "3px solid #E3E8EF", borderTop: "3px solid #0C447C", borderRadius: "50%", animation: "spin 0.8s linear infinite" },
   loadingText: { color: "#0C447C", fontWeight: 600 },
+
+  // Debug panel
+  debugToggleBtn: { display: "flex", alignItems: "center", justifyContent: "center", width: "24px", height: "24px", borderRadius: "50%", border: "1px dashed #CBD5E1", backgroundColor: "#fff", cursor: "pointer", fontSize: "13px", fontWeight: "700", color: "#CBD5E1", fontFamily: "'Segoe UI', Tahoma, Arial, sans-serif", lineHeight: 1 },
+  debugPanel: { marginBottom: "12px", backgroundColor: "#F8FAFC", border: "1px dashed #CBD5E1", borderRadius: "10px", padding: "10px 14px" },
+  debugLockRow: { display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" },
+  debugPassInput: { padding: "5px 10px", borderRadius: "7px", border: "1px solid #E8ECF2", fontSize: "12px", outline: "none", fontFamily: "'Segoe UI', Tahoma, Arial, sans-serif", width: "140px" },
+  debugPassBtn: { padding: "5px 14px", borderRadius: "7px", border: "none", backgroundColor: "#0C447C", color: "#fff", fontSize: "12px", cursor: "pointer", fontFamily: "'Segoe UI', Tahoma, Arial, sans-serif" },
+  debugChipsRow: { display: "flex", gap: "8px", flexWrap: "wrap" },
 };

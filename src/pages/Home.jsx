@@ -6,9 +6,11 @@ import logo3 from "../assets/logo3.png";
 import icon1 from "../assets/avatar4.jpg";
 import icon2 from "../assets/avatar2.png";
 import icon3 from "../assets/avatar3.jpg";
-import heroAvatar from "../assets/avatar.png";
+import dashboardImg from "../assets/avatar.png";
+import DownloadAppCard from "../components/DownloadAppCard";
 import useWindowWidth, { isSmall } from "../hooks/useWindowWidth";
 import { gsap } from "gsap";
+
 
 export default function Home() {
   const navigate = useNavigate();
@@ -97,22 +99,82 @@ export default function Home() {
                 <button className="bp" onClick={(e) => { animBtn(e); navigate("/signup"); }}>إنشاء حساب</button>
                 <button className="bg2" onClick={(e) => { animBtn(e); navigate("/signin"); }}>تسجيل الدخول</button>
               </div>
-            </div>
-
-            {/* Avatar */}
-            <div className="hero-av-wrap">
-              <div className="hero-av-ring hero-av-ring-1" />
-              <div className="hero-av-ring hero-av-ring-2" />
-              <div className="hero-av-border">
-                <img src={heroAvatar} alt="" className="hero-av-img" />
-              </div>
-              <div className="hero-av-badge">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                  <path d="M20 6L9 17l-5-5" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
+              <DownloadAppCard />
             </div>
           </div>
+
+          {/* Dashboard Circle with Wave */}
+          <div className="dash-preview-wrap">
+            <div className="dash-blob" />
+
+            {/* الدايرة الرئيسية */}
+            <div className="dash-circle-wrap">
+              {/* حلقات دوارة */}
+              <div className="hero-av-ring hero-av-ring-1" />
+              <div className="hero-av-ring hero-av-ring-2" />
+
+              {/* الدايرة نفسها */}
+              <svg className="dash-circle-svg" viewBox="0 0 220 220" width="220" height="220">
+                <defs>
+                  <clipPath id="dash-circle-clip">
+                    <circle cx="110" cy="110" r="107" />
+                  </clipPath>
+                  <linearGradient id="dash-bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%"   stopColor="#0d3b6e" />
+                    <stop offset="100%" stopColor="#1a6fa8" />
+                  </linearGradient>
+                  <linearGradient id="dash-wave-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%"   stopColor="#E8620A" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="#E8620A" stopOpacity="0.3" />
+                  </linearGradient>
+                  <linearGradient id="dash-wave-grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.08" />
+                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0.02" />
+                  </linearGradient>
+                </defs>
+
+                {/* خلفية */}
+                <circle cx="110" cy="110" r="107" fill="url(#dash-bg-grad)" />
+
+                <g clipPath="url(#dash-circle-clip)">
+                  {/* نقاط زخرفية */}
+                  <circle cx="30"  cy="40"  r="22" fill="rgba(255,255,255,0.04)" />
+                  <circle cx="185" cy="30"  r="32" fill="rgba(255,255,255,0.04)" />
+                  <circle cx="195" cy="90"  r="14" fill="rgba(232,98,10,0.10)" />
+
+                  {/* wave 1 */}
+                  <path
+                    d="M0 160 Q30 138 60 152 Q90 166 120 145 Q150 124 180 140 Q205 152 220 144 L220 220 L0 220 Z"
+                    fill="url(#dash-wave-grad)"
+                  />
+                  {/* wave 2 */}
+                  <path
+                    d="M0 175 Q35 160 70 170 Q105 180 135 163 Q160 150 190 162 Q208 170 220 165 L220 220 L0 220 Z"
+                    fill="url(#dash-wave-grad2)"
+                  />
+                </g>
+
+                {/* إطار الدايرة */}
+                <circle cx="110" cy="110" r="107" fill="none" stroke="rgba(232,98,10,0.35)" strokeWidth="1.5" />
+              </svg>
+
+              {/* شاشة PC جوا الدايرة */}
+              <div className="dash-pc-wrap">
+                <div className="dash-pc-screen" style={{height: '110px'}}>
+                  <div className="dash-pc-bar">
+                    <span style={{width:5,height:5,borderRadius:"50%",background:"#ff5f57",display:"inline-block"}}/>
+                    <span style={{width:5,height:5,borderRadius:"50%",background:"#febc2e",display:"inline-block"}}/>
+                    <span style={{width:5,height:5,borderRadius:"50%",background:"#28c840",display:"inline-block"}}/>
+                  </div>
+                  <img src={dashboardImg} alt="dashboard" className="dash-pc-img" />
+                </div>
+                <div className="dash-pc-neck" />
+                <div className="dash-pc-base" />
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
         {/* Right — floating card */}
@@ -173,9 +235,9 @@ export default function Home() {
                 <div className="fc-head">
                   <div className="icon-wrap" style={{ background: "var(--orange-light)" }}>
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="8" r="4" stroke="#D9632A" strokeWidth="1.5" />
-                      <path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#D9632A" strokeWidth="1.5" strokeLinecap="round" />
-                      <path d="M19 4v6M16 7h6" stroke="#D9632A" strokeWidth="1.5" strokeLinecap="round" />
+                      <circle cx="12" cy="8" r="4" stroke="#E8620A" strokeWidth="1.5" />
+                      <path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#E8620A" strokeWidth="1.5" strokeLinecap="round" />
+                      <path d="M19 4v6M16 7h6" stroke="#E8620A" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
                   </div>
                   <strong>إنشاء حساب جديد</strong>

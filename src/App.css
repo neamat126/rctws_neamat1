@@ -181,4 +181,17 @@
     right: 0;
     border-right-color: var(--border);
   }
+
+
+.hero-l{
+
+position:relative;
+
+}
+.download-card{
+    width:280px;
+    padding:16px 18px;
+    border-radius:18px;
+}
+  
 }

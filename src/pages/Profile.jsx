@@ -379,7 +379,13 @@ export default function Profile() {
   // إشعار تذكير في شهر 7 و 10
   useEffect(() => {
     const month = new Date().getMonth() + 1;
-    if (month === 7 || month === 10) {
+    const monthNames = {
+      1: "يناير", 3: "مارس", 5: "مايو",
+      7: "يوليو", 10: "أكتوبر", 12: "ديسمبر"
+    };
+    const reminderMonths = [1, 3, 5, 7, 10, 12];
+
+    if (reminderMonths.includes(month)) {
       const popupKey = `reminder_dismissed_${new Date().getFullYear()}_${month}`;
       const notifKey = `reminder_notif_added_${new Date().getFullYear()}_${month}`;
 
@@ -387,7 +393,7 @@ export default function Profile() {
       if (!localStorage.getItem(notifKey)) {
         addNotification({
           title: "تذكير: تقديم طلبات البرامج التدريبية",
-          message: `تذكير بضرورة تقديم طلبات البرامج التدريبية قبل نهاية شهر ${month === 7 ? "يوليو" : "أكتوبر"}. يرجى المبادرة بتقديم طلباتك في أقرب وقت.`,
+          message: `تذكير بضرورة تقديم طلبات البرامج التدريبية قبل نهاية شهر ${monthNames[month]}. يرجى المبادرة بتقديم طلباتك في أقرب وقت.`,
           icon: "🔔",
         });
         localStorage.setItem(notifKey, "1");
@@ -903,7 +909,7 @@ export default function Profile() {
 
             <div style={s.card}>
               <div style={s.cardTitleRow}>
-                <h4 style={s.cardTitle}>بيانات مخفية</h4>
+                <h4 style={s.cardTitle}>.</h4>
                 <button style={s.toggleCardBtn} onClick={() => {
                   if (hiddenUnlocked) {
                     setHiddenExpanded(!hiddenExpanded);
@@ -917,7 +923,7 @@ export default function Profile() {
                     style={{ transform: hiddenExpanded ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
                     <polyline points="6 9 12 15 18 9"/>
                   </svg>
-                  {hiddenExpanded ? "إخفاء" : "عرض"}
+                  {hiddenExpanded ? "-" : "."}
                 </button>
               </div>
               {hiddenExpanded && !hiddenUnlocked && (
@@ -926,7 +932,7 @@ export default function Profile() {
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                     <path d="M7 11V7a5 5 0 0110 0v4"/>
                   </svg>
-                  <p style={s.passwordPromptText}>أدخل كلمة المرور للوصول إلى البيانات المخفية</p>
+                  <p style={s.passwordPromptText}>أدخل كلمة المرور للوصول إلى البيانات التقنية خاص بالدعم الفني</p>
                   <div style={s.passwordInputRow}>
                     <input
                       type="password"
@@ -965,6 +971,7 @@ export default function Profile() {
                   <DataRow label="كود القطاع"         value={sectorCode} />
                   <DataRow label="حالة المرحلة"       value={phaseStatus} />
                   <DataRow label="السنوات في المرحلة" value={actualYears} />
+                  <DataRow label="السنوات المتبقية (API)" value={data?.year_remaining ?? "—"} />
                   {deptParts.map((part, i) => (
                     <DataRow key={i} label={deptLabels[i] || `المستوى ${i+1}`} value={part.trim() || "—"} />
                   ))}
@@ -1103,13 +1110,13 @@ const s = {
     width: "12px", height: "12px", borderRadius: "50%",
     backgroundColor: "#10B981", border: "2px solid #041d52",
   },
-  employeeName: { color: "#fff", fontSize: "13px", fontWeight: "700", margin: "0 0 3px", lineHeight: 1.4 },
-  employeeRole: { color: "rgba(255,255,255,0.45)", fontSize: "11px", margin: "0 0 10px" },
+  employeeName: { color: "#fff", fontSize: "18px", fontWeight: "700", margin: "0 0 3px", lineHeight: 1.4 },
+  employeeRole: { color: "rgba(255,255,255,0.45)", fontSize: "15px", margin: "0 0 10px" },
   activePill: {
     display: "inline-flex", alignItems: "center", gap: "5px",
     backgroundColor: "rgba(16,185,129,0.15)", color: "#6EE7B7",
     border: "1px solid rgba(16,185,129,0.3)",
-    padding: "3px 10px", borderRadius: "20px", fontSize: "10px", fontWeight: "600",
+    padding: "3px 10px", borderRadius: "20px", fontSize: "14px", fontWeight: "600",
   },
   activeDot: {
     width: "6px", height: "6px", borderRadius: "50%",
@@ -1119,16 +1126,16 @@ const s = {
     width: "100%", padding: "9px 12px", display: "flex", alignItems: "center", gap: "10px",
     backgroundColor: "rgba(239,68,68,0.08)", color: "rgba(252,165,165,0.85)",
     border: "1px solid rgba(239,68,68,0.18)", borderRadius: "8px",
-    cursor: "pointer", fontSize: "12px", fontWeight: "600",
+    cursor: "pointer", fontSize: "16px", fontWeight: "600",
   },  nav: { display: "flex", flexDirection: "column", gap: "2px" },
   navSectionLabel: {
-    color: "rgba(255,255,255,0.22)", fontSize: "9px", fontWeight: "700",
+    color: "rgba(255,255,255,0.22)", fontSize: "13px", fontWeight: "700",
     letterSpacing: "1.2px", textTransform: "uppercase",
     margin: "4px 0 6px 4px", whiteSpace: "nowrap",
   },
   navLink: {
     color: "rgba(255,255,255,0.55)", textDecoration: "none",
-    padding: "9px 12px", borderRadius: "8px", fontSize: "12px",
+    padding: "9px 12px", borderRadius: "8px", fontSize: "16px",
     fontWeight: "600",
     display: "flex", alignItems: "center", gap: "10px", cursor: "pointer",
     whiteSpace: "nowrap", overflow: "hidden",
@@ -1151,20 +1158,20 @@ const s = {
     margin: "14px 4px 8px",
   },
   navDividerLabel: {
-    color: "rgba(255,255,255,0.22)", fontSize: "9px", fontWeight: "700",
+    color: "rgba(255,255,255,0.22)", fontSize: "13px", fontWeight: "700",
     letterSpacing: "1.2px", textTransform: "uppercase", whiteSpace: "nowrap",
   },
   badge: {
     backgroundColor: "#1e4d8c", color: "#7db8e8",
     padding: "1px 7px", borderRadius: "10px",
-    fontSize: "10px", fontWeight: "700", flexShrink: 0,
+    fontSize: "14px", fontWeight: "700", flexShrink: 0,
   },
   badgeActive: { backgroundColor: "#378ADD", color: "#fff" },
   tooltip: {
     position: "absolute", right: "100%", top: "50%",
     transform: "translateY(-50%)",
     backgroundColor: "#1a3a6b", color: "#fff",
-    fontSize: "11px", fontWeight: "600",
+    fontSize: "15px", fontWeight: "600",
     padding: "5px 10px", borderRadius: "6px",
     whiteSpace: "nowrap", marginRight: "8px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
@@ -1192,7 +1199,7 @@ const s = {
     border: "1.5px solid rgba(55,138,221,0.4)",
     display: "flex", alignItems: "center", justifyContent: "center",
   },
-  userCardInitials: { fontSize: "13px", fontWeight: "700", color: "#7db8e8" },
+  userCardInitials: { fontSize: "17px", fontWeight: "700", color: "#7db8e8" },
   userCardOnline: {
     position: "absolute", bottom: "0px", left: "0px",
     width: "9px", height: "9px", borderRadius: "50%",
@@ -1200,11 +1207,11 @@ const s = {
   },
   userCardInfo: { flex: 1, minWidth: 0 },
   userCardName: {
-    color: "#fff", fontSize: "11.5px", fontWeight: "600",
+    color: "#fff", fontSize: "15.5px", fontWeight: "600",
     margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
   },
   userCardRole: {
-    color: "rgba(255,255,255,0.4)", fontSize: "10px",
+    color: "rgba(255,255,255,0.4)", fontSize: "14px",
     margin: "2px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
   },
   logoutIconBtn: {
@@ -1217,7 +1224,7 @@ const s = {
   center: { display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "100vh", gap: 16, direction: "rtl" },
   loadingText: { color: "#0C447C", fontWeight: 600, marginTop: 12 },
   spinner: { width: 34, height: 34, border: "3px solid #E3E8EF", borderTop: "3px solid #0C447C", borderRadius: "50%", animation: "spin 0.8s linear infinite" },
-  btn: { padding: "10px 28px", backgroundColor: "#0C447C", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: 14 },
+  btn: { padding: "10px 28px", backgroundColor: "#0C447C", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: 16 },
 
   // Stats
   statsGrid3: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "10px", marginBottom: "10px" },
@@ -1233,85 +1240,85 @@ const s = {
     display: "flex", alignItems: "center", justifyContent: "center",
   },
   statText: { flex: 1, textAlign: "right" },
-  statLabel: { fontSize: "10px", color: "#9AA3AF", margin: 0, lineHeight: "1.3" },
+  statLabel: { fontSize: "14px", color: "#9AA3AF", margin: 0, lineHeight: "1.3" },
   statValue: { fontWeight: "700", margin: 0, wordBreak: "break-word" },
 
   // Layout
   twoColumn: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" },
   column: { display: "flex", flexDirection: "column", gap: "14px" },
   card: { backgroundColor: "#fff", border: "1px solid #E8ECF2", borderRadius: "12px", padding: "18px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" },
-  cardTitle: { fontSize: "13px", fontWeight: "700", color: "#0C447C", margin: 0 },
+  cardTitle: { fontSize: "17px", fontWeight: "700", color: "#0C447C", margin: 0 },
   cardTitleRow: {
     display: "flex", justifyContent: "space-between", alignItems: "center",
     marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid #EEF1F6",
   },
   employeeBadge: {
-    backgroundColor: "#D1FAE5", color: "#065F46", fontSize: "11px",
+    backgroundColor: "#D1FAE5", color: "#065F46", fontSize: "15px",
     fontWeight: "700", padding: "3px 12px", borderRadius: "12px",
   },
 
   // DataRow
-  dataRow: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #F5F7FA", fontSize: "12.5px" },
+  dataRow: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #F5F7FA", fontSize: "16px" },
   dataLabel: { color: "#6B7280", fontWeight: "600" },
   dataValue: { color: "#1A2535", fontWeight: "500", textAlign: "left", maxWidth: "60%", wordBreak: "break-word", lineHeight: "1.5" },
-  highlightBlue: { backgroundColor: "#EBF4FF", color: "#1D4ED8", fontWeight: "700", padding: "2px 10px", borderRadius: "6px", fontSize: "12px" },
-  highlightOrange: { backgroundColor: "#FEF3C7", color: "#92400E", fontWeight: "700", padding: "2px 10px", borderRadius: "6px", fontSize: "12px" },
+  highlightBlue: { backgroundColor: "#EBF4FF", color: "#1D4ED8", fontWeight: "700", padding: "2px 10px", borderRadius: "6px", fontSize: "15px" },
+  highlightOrange: { backgroundColor: "#FEF3C7", color: "#92400E", fontWeight: "700", padding: "2px 10px", borderRadius: "6px", fontSize: "15px" },
 
   // Programs
-  programsCountBadge: { backgroundColor: "#EEF2FF", color: "#4338CA", fontSize: "11px", fontWeight: "700", padding: "3px 10px", borderRadius: "20px", border: "1px solid #C7D2FE" },
+  programsCountBadge: { backgroundColor: "#EEF2FF", color: "#4338CA", fontSize: "15px", fontWeight: "700", padding: "3px 10px", borderRadius: "20px", border: "1px solid #C7D2FE" },
   programsList: { display: "flex", flexDirection: "column", gap: "8px" },
   programCard: { display: "flex", borderRadius: "8px", overflow: "hidden", border: "1px solid #E8ECF2", backgroundColor: "#fff", cursor: "pointer", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
   programCardImg: { position: "relative", width: "150px", minHeight: "85px", flexShrink: 0, overflow: "hidden" },
   programImg: { width: "100%", height: "100%", objectFit: "cover" },
-  programCardCode: { position: "absolute", bottom: "4px", left: "4px", backgroundColor: "rgba(0,0,0,0.55)", color: "#fff", fontSize: "9px", fontWeight: "700", padding: "1px 5px", borderRadius: "4px" },
+  programCardCode: { position: "absolute", bottom: "4px", left: "4px", backgroundColor: "rgba(0,0,0,0.55)", color: "#fff", fontSize: "13px", fontWeight: "700", padding: "1px 5px", borderRadius: "4px" },
   programCardBody: { flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", justifyContent: "center" },
-  programCardName: { fontSize: "12px", fontWeight: "600", color: "#1A2535", margin: "0 0 6px", lineHeight: "1.4", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textAlign: "right" },
+  programCardName: { fontSize: "16px", fontWeight: "600", color: "#1A2535", margin: "0 0 6px", lineHeight: "1.4", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textAlign: "right" },
   programCardFooter: { display: "flex", justifyContent: "space-between", alignItems: "center" },
-  programCardStars: { fontSize: "11px", color: "#F59E0B" },
-  programCardBadge: { fontSize: "10px", fontWeight: "700", padding: "2px 7px", borderRadius: "8px", backgroundColor: "#E6F4EE", color: "#0F5132" },
+  programCardStars: { fontSize: "15px", color: "#F59E0B" },
+  programCardBadge: { fontSize: "14px", fontWeight: "700", padding: "2px 7px", borderRadius: "8px", backgroundColor: "#E6F4EE", color: "#0F5132" },
   toggleCardBtn: {
     display: "flex", alignItems: "center", gap: "4px",
     padding: "3px 10px", borderRadius: "6px",
     backgroundColor: "#EEF2FF", color: "#4338CA",
     border: "1px solid #C7D2FE", cursor: "pointer",
-    fontSize: "11px", fontWeight: "600",
+    fontSize: "15px", fontWeight: "600",
   },
-  seeMoreBtn: { width: "100%", marginTop: "10px", padding: "8px", backgroundColor: "#EEF2FF", color: "#4338CA", border: "1px solid #C7D2FE", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: "700" },
+  seeMoreBtn: { width: "100%", marginTop: "10px", padding: "8px", backgroundColor: "#EEF2FF", color: "#4338CA", border: "1px solid #C7D2FE", borderRadius: "8px", cursor: "pointer", fontSize: "16px", fontWeight: "700" },
 
   // Password prompt
   passwordPrompt: { display: "flex", flexDirection: "column", alignItems: "center", padding: "20px 12px", gap: "8px" },
-  passwordPromptText: { color: "#6B7280", fontSize: "12px", fontWeight: "600", margin: 0, textAlign: "center" },
+  passwordPromptText: { color: "#6B7280", fontSize: "16px", fontWeight: "600", margin: 0, textAlign: "center" },
   passwordInputRow: { display: "flex", gap: "8px", width: "100%", maxWidth: "280px" },
-  passwordInput: { flex: 1, padding: "8px 12px", borderRadius: "8px", border: "1.5px solid #D1D5DB", fontSize: "13px", outline: "none", textAlign: "right", direction: "rtl", backgroundColor: "#F9FAFB" },
-  passwordBtn: { padding: "8px 16px", backgroundColor: "#1B4F7A", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: "700", whiteSpace: "nowrap" },
-  passwordError: { color: "#EF4444", fontSize: "11px", fontWeight: "600", margin: 0 },
+  passwordInput: { flex: 1, padding: "8px 12px", borderRadius: "8px", border: "1.5px solid #D1D5DB", fontSize: "15px", outline: "none", textAlign: "right", direction: "rtl", backgroundColor: "#F9FAFB" },
+  passwordBtn: { padding: "8px 16px", backgroundColor: "#1B4F7A", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "14px", fontWeight: "700", whiteSpace: "nowrap" },
+  passwordError: { color: "#EF4444", fontSize: "13px", fontWeight: "600", margin: 0 },
 
   // Warning
-  warningNote: { display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#FAEEDA", border: "1px solid #EF9F27", color: "#854F0B", padding: "10px 14px", borderRadius: "8px", fontSize: "12px", lineHeight: "1.6" },
+  warningNote: { display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#FAEEDA", border: "1px solid #EF9F27", color: "#854F0B", padding: "10px 14px", borderRadius: "8px", fontSize: "16px", lineHeight: "1.6" },
 
   // Progress bar
   progressCard: { backgroundColor: "#fff", border: "1px solid #E8ECF2", borderRadius: "16px", padding: "16px 20px", marginBottom: "18px", boxShadow: "0 2px 12px rgba(27,79,122,0.08)" },
   progressHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
   progressLabelGroup: { display: "flex", alignItems: "center", gap: "10px", flex: 1 },
   progressIconWrap: { width: 50, height: 50, borderRadius: "14px", background: `linear-gradient(135deg, #EFF6FF, #DBEAFE)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 8px rgba(27,79,122,0.12)" },
-  progressTitle: { fontSize: "13px", fontWeight: "700", color: "#1A2332", margin: "0 0 2px" },
-  progressMsg: { fontSize: "11px", color: "#9AA3AF", margin: 0 },
+  progressTitle: { fontSize: "17px", fontWeight: "700", color: "#1A2332", margin: "0 0 2px" },
+  progressMsg: { fontSize: "15px", color: "#9AA3AF", margin: 0 },
   progressCircle: { width: 52, height: 52, borderRadius: "50%", border: "3px solid", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  progressPct: { fontSize: "14px", fontWeight: "800" },
+  progressPct: { fontSize: "18px", fontWeight: "800" },
   progressTrack: { height: 12, backgroundColor: "#F0F2F5", borderRadius: 99, overflow: "hidden", marginBottom: 10, position: "relative" },
   progressFill: { height: "100%", borderRadius: 99, transition: "width 1s cubic-bezier(.4,0,.2,1)", position: "relative", overflow: "hidden" },
   progressShine: { position: "absolute", top: 0, left: 0, right: 0, height: "50%", background: "rgba(255,255,255,0.25)", borderRadius: 99 },
-  progressSub: { display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: "600" },
+  progressSub: { display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: "600" },
 
   // Dual progress card
   dualProgressCard: { backgroundColor: "#fff", border: "1px solid #E8ECF2", borderRadius: "16px", padding: "16px 20px", marginBottom: "18px", boxShadow: "0 2px 12px rgba(27,79,122,0.08)" },
   dualProgressHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid #F0F2F5" },
-  dualProgressTitle: { fontSize: "14px", fontWeight: "700", color: "#1A2332" },
-  dualProgressMsg: { fontSize: "11px", color: "#9AA3AF" },
+  dualProgressTitle: { fontSize: "18px", fontWeight: "700", color: "#1A2332" },
+  dualProgressMsg: { fontSize: "15px", color: "#9AA3AF" },
   singleBar: { flex: 1, display: "flex", flexDirection: "column", gap: 8 },
   singleBarTop: { display: "flex", alignItems: "center", gap: 10 },
-  singleBarLabel: { fontSize: "12px", fontWeight: "600", color: "#6B7280", margin: "0 0 2px" },
-  singleBarValue: { fontSize: "14px", fontWeight: "800", margin: 0 },
+  singleBarLabel: { fontSize: "16px", fontWeight: "600", color: "#6B7280", margin: "0 0 2px" },
+  singleBarValue: { fontSize: "18px", fontWeight: "800", margin: 0 },
   dualDivider: { width: 1, backgroundColor: "#F0F2F5", alignSelf: "stretch", margin: "0 4px" },
 
   // Mobile
@@ -1355,8 +1362,8 @@ const s = {
     animation: "pulse 2s ease-in-out infinite",
   },
   blockIconEmoji: { fontSize: 36, position: "relative", zIndex: 1 },
-  blockTitle: { fontSize: 20, fontWeight: 700, color: "#1A2332", margin: "0 0 12px" },
-  blockMsg: { fontSize: 14, color: "#6B7280", lineHeight: 1.9, margin: "0 0 20px" },
+  blockTitle: { fontSize: 22, fontWeight: 700, color: "#1A2332", margin: "0 0 12px" },
+  blockMsg: { fontSize: 16, color: "#6B7280", lineHeight: 1.9, margin: "0 0 20px" },
   blockDivider: {
     height: 1,
     background: "linear-gradient(90deg, transparent, #e5e7eb, transparent)",
@@ -1372,7 +1379,7 @@ const s = {
     boxShadow: "0 4px 15px rgba(27,79,122,0.4)",
     marginBottom: 14,
   },
-  blockHint: { fontSize: 11, color: "#9CA3AF", margin: 0 },
+  blockHint: { fontSize: 13, color: "#9CA3AF", margin: 0 },
 
   // Reminder banner
   reminderOverlay: {
@@ -1399,11 +1406,11 @@ const s = {
     margin: "0 auto 1.25rem",
   },
   reminderTitle: {
-    fontSize: 20, fontWeight: 700, color: "#92400E",
+    fontSize: 22, fontWeight: 700, color: "#92400E",
     margin: "0 0 12px",
   },
   reminderMsg: {
-    fontSize: 14, color: "#78350F", lineHeight: 1.9,
+    fontSize: 16, color: "#78350F", lineHeight: 1.9,
     margin: "0 0 24px",
   },
   reminderBtns: {
@@ -1413,7 +1420,7 @@ const s = {
     flex: 1, padding: "12px",
     background: "linear-gradient(135deg, #D97706, #F59E0B)",
     color: "#fff", border: "none", borderRadius: 12,
-    fontSize: 14, fontWeight: 700, cursor: "pointer",
+    fontSize: 16, fontWeight: 700, cursor: "pointer",
     fontFamily: "inherit",
     boxShadow: "0 4px 15px rgba(217,119,6,0.4)",
   },
@@ -1421,7 +1428,7 @@ const s = {
     flex: 1, padding: "12px",
     background: "#fff", color: "#92400E",
     border: "1.5px solid #FDE68A", borderRadius: 12,
-    fontSize: 14, fontWeight: 600, cursor: "pointer",
+    fontSize: 16, fontWeight: 600, cursor: "pointer",
     fontFamily: "inherit",
   },
 };
